@@ -1,6 +1,9 @@
-// /* You can add global styles to this file, and also import other style files */
-// Sidebar / Header → #0F2A44
-// Buttons / Active menu → #1E5EFF
-// Hover / Highlight → #00A8FF
-// Icons / Gradient → #3EDBF0
-// Main background → #0A192F (dark theme mate)
+:root {
+    --primary-color: #0A192F;
+    --secondary-color: #0F2A44;
+    --third-color: white;
+    --black-color: black;
+    --dark-gray-color: #333333;
+    --light-gray-color: #555555;
+    --background-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}

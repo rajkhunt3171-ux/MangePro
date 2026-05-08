@@ -1,1 +1,25 @@
-<p>login works!</p>
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="header-section">
+            <img src="../../assets/img/logo_new.png" alt="">
+            <p>Please sign in to your account</p>
+        </div>
+        <div class="body-section">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input class="input-field" type="text" id="email" placeholder="Enter your email" [(ngModel)]="loginReq.email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input class="input-field" type="password" id="password" placeholder="Enter your password" [(ngModel)]="loginReq.password">
+                </div>
+            </div>
+        </div>
+        <div class="footer-section">
+            <div class="submit-btn">
+                <div class="secondary-btn" (click)="login()">Sign In</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { SharedService } from './shared/service/shared-service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,16 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('temp');
+  constructor(
+    public sharedService: SharedService,
+    public router: Router
+  ) { }
+
+  ngOnInit() {
+    if (this.sharedService.isLoggedUser()) {
+      this.router.navigate(['/dashboard']);
+    }else{
+      this.router.navigate(['/login']);
+    }
+  }
 }

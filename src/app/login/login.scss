@@ -1,0 +1,28 @@
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: var(--background-gradient);
+}
+
+.login-card {
+    background: var(--third-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.secondary-btn.disabled {
+  background: var(--disabled-color);
+  cursor: not-allowed;
+}
