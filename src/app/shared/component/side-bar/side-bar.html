@@ -1,11 +1,7 @@
 <div class="sidebar-wrapper">
     <div class="sidebar-main">
         <div class="sidebar-brand">
-            <div class="brand-mark">S</div>
-            <div>
-                <h1>{{ sharedService?.userDetails?.username }}</h1>
-                <p>{{sharedService?.userDepartment?.name}}</p>
-            </div>
+            <img src="../../../../assets/img/logo_new.png" alt="">
         </div>
 
         <nav class="sidebar-nav">
@@ -14,5 +10,10 @@
                 <span class="sidebar-text">{{ item.name }}</span>
             </a>
         </nav>
+
+        <div class="sidebar-user-details">
+            <h1>{{ sharedService?.userDetails?.username }}</h1>
+            <p><b>Department : </b>{{sharedService?.userDepartment?.name}}</p>
+        </div>
     </div>
 </div>

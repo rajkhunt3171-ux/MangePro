@@ -1,59 +1,60 @@
 .sidebar-wrapper {
   display: flex;
   flex-direction: column;
-  // width: 280px;
   min-height: 100vh;
   height: 100vh;
   background: var(--secondary-color);
-  padding:20px 15px;
+  padding: 15px;
   color: var(--third-color);
 }
 
 .sidebar-main {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
   overflow: hidden;
+  height: 100%;
 }
 
 .sidebar-brand {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  flex-shrink: 0;
-}
+  margin-bottom: 15px;
+  background-color: var(--third-color);
+  text-align: center;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
 
-.brand-mark {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 20px;
-  margin-right: 14px;
-}
-
-.sidebar-brand h1 {
-  font-size: 18px;
-  margin-bottom: 3px;
-  color: #ffffff;
-}
-
-.sidebar-brand p {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.72);
+  img {
+    width: 100px;
+    margin-bottom: 3px;
+  }
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex: 1 1 auto;
   overflow-y: auto;
   padding-right: 4px;
+  flex: 1;
+}
+
+.sidebar-user-details {
+  margin-top: auto;
+  background-color: var(--third-color);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.sidebar-user-details h1 {
+  font-size: 18px;
+  margin-bottom: 3px;
+  color: var(--primary-color);
+}
+
+.sidebar-user-details p {
+  color: var(--primary-color);
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -72,17 +73,10 @@
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--third-color);
   text-decoration: none;
-  transition: background 0.2s, color 0.2s;
-}
-
-.sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
 }
 
 .sidebar-link i {
@@ -92,12 +86,6 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 16px;
-  color: #ffffff;
+  font-size: 14px;
+  color: var(--third-color);
 }
-
-.sidebar-text {
-  font-size: 15px;
-  letter-spacing: 0.02em;
-}
-
