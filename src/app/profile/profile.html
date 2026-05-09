@@ -1,0 +1,17 @@
+<div class="profile-page">
+  <div class="profile-card">
+    <h2>Profile</h2>
+    <div class="profile-row">
+      <span>Name</span>
+      <strong>{{ sharedService?.userDetails?.username || 'Unknown' }}</strong>
+    </div>
+    <div class="profile-row">
+      <span>Email</span>
+      <strong>{{ sharedService?.userDetails?.email || 'N/A' }}</strong>
+    </div>
+    <div class="profile-row">
+      <span>Department</span>
+      <strong>{{ sharedService?.userDepartment?.name || 'N/A' }}</strong>
+    </div>
+  </div>
+</div>

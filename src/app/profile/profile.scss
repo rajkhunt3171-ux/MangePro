@@ -1,0 +1,27 @@
+.profile-page {
+  padding: 20px;
+}
+
+.profile-card {
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 10px 30px;
+}
+
+.profile-card h2 {
+  margin-bottom: 16px;
+  color: #0f2a44;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #4a5568;
+}
+
+.profile-row strong {
+  color: #111827;
+}

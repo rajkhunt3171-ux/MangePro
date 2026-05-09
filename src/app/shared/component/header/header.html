@@ -1,12 +1,11 @@
-<!-- <div class="header-content">
-    <div class="row m-0">
-        <div class="col-3 p-0">
+<div class="header-content">
+  <div class="header-left">
+    <div class="header-title">Welcome </div>
+    <div class="header-user">#{{ sharedService?.userDetails?.department || 'Guest' }}</div>
+  </div>
 
-        </div>
-        <div class="col-9 p-0">
-            
-        </div>  
-    </div>
-</div> -->
-
-fhgdjskfhg
+  <div class="header-right">
+    <button class="border-btn" (click)="openProfile()">Profile</button>
+    <button class="border-btn" (click)="logout()">Logout</button>
+  </div>
+</div>
