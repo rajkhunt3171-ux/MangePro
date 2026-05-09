@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { loginReq, loginRes } from './login.model';
 import { SharedService } from '../shared/service/shared-service';
 import { LoginService } from './login.service';
+import { Headers } from '../shared/component/header/headers';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,8 @@ export class Login implements OnInit {
   constructor(
     public sharedService: SharedService,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private headersService: Headers
   ) { }
 
   ngOnInit() {
@@ -29,10 +31,24 @@ export class Login implements OnInit {
     this.loginService.login(this.loginReq).subscribe({
       next: (res) => {
         localStorage.setItem('authToken', res.token);
-        this.router.navigate(['/']);
+        this.loadUserDetails();
       },
       error: (error) => {
         console.error('Login error', error);
+      }
+    });
+  }
+
+  loadUserDetails() {
+    this.headersService.getUserDetails().subscribe({
+      next: (res) => {
+        this.sharedService.userDetails = res.user;
+        this.sharedService.userDepartment = res.department;
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Error fetching user details', error);
+        localStorage.removeItem('authToken');
       }
     });
   }

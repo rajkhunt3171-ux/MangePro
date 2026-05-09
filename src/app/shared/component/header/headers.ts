@@ -16,7 +16,7 @@ export class Headers {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     this.router.navigate(['/login']);
   }
 }

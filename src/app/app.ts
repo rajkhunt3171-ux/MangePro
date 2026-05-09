@@ -29,7 +29,9 @@ export class App {
       next: (res) => {
         this.sharedService.userDetails = res.user;
         this.sharedService.userDepartment = res.department;
-        this.router.navigate(['/dashboard']);
+        if (this.router.url === '/login') {
+          this.router.navigate(['/']);
+        }
       },
       error: (error) => {
         console.error('Error fetching user details', error);
