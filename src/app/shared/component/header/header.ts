@@ -9,26 +9,12 @@ import { Headers } from './headers';
   styleUrl: './header.scss',
 })
 export class Header implements OnInit {
-  user: any;
-
   constructor(
     public sharedService: SharedService,
     private headersService: Headers
   ) { }
 
   ngOnInit() {
-    this.userDetails();
-  }
-
-  userDetails() {
-    this.headersService.getUserDetails().subscribe({
-      next: (data) => {
-        this.user = data;
-      },
-      error: (error) => {
-        console.error('Error fetching user details', error);
-      }
-    });
   }
 
   logout() {

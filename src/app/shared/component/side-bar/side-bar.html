@@ -3,20 +3,16 @@
         <div class="sidebar-brand">
             <div class="brand-mark">S</div>
             <div>
-                <h1>App Name</h1>
-                <p>Admin Panel</p>
+                <h1>{{ sharedService?.userDetails?.username }}</h1>
+                <p>{{sharedService?.userDepartment?.name}}</p>
             </div>
         </div>
 
         <nav class="sidebar-nav">
             <a *ngFor="let item of coreDepartment" class="sidebar-link" [routerLink]="item.url">
-                <i class="sidebar-icon fa" [class]="item?.icon"></i>
+                <i class="{{ item?.icon }}"></i>
                 <span class="sidebar-text">{{ item.name }}</span>
             </a>
         </nav>
-    </div>
-
-    <div class="sidebar-footer">
-        <div class="primary-btn logout-btn">Logout</div>
     </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { SharedService } from '../../service/shared-service';
 
 @Component({
   selector: 'app-side-bar',
@@ -48,12 +49,12 @@ export class SideBar {
       url: '/staff',
       icon: 'fas fa-users'
     }
-  ]
-  menuItems = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/' },
-    { label: 'Profile', icon: 'person', route: '/profile' },
-    { label: 'Messages', icon: 'chat', route: '/messages' },
-    { label: 'Settings', icon: 'settings', route: '/settings' },
-    { label: 'Support', icon: 'support', route: '/support' }
   ];
+
+  constructor(
+    public sharedService: SharedService
+  ) { }
+
+  ngOnInit() {
+  }
 }

@@ -1,7 +1,7 @@
 .sidebar-wrapper {
   display: flex;
   flex-direction: column;
-  width: 280px;
+  // width: 280px;
   min-height: 100vh;
   height: 100vh;
   background: var(--secondary-color);
@@ -85,7 +85,7 @@
   color: #ffffff;
 }
 
-.sidebar-icon {
+.sidebar-link i {
   width: 34px;
   height: 34px;
   background: rgba(255, 255, 255, 0.08);

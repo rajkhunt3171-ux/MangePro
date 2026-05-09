@@ -6,6 +6,8 @@ import { Injectable } from '@angular/core';
 export class SharedService {
 
   authToken: string = '';
+  userDetails: any;
+  userDepartment: any;
 
   isLoggedUser() {
     this.authToken = localStorage.getItem('authToken');
