@@ -1,0 +1,68 @@
+<div class="doctor-container">
+  <div class="doctor-header">
+    <h1>Doctor Management</h1>
+    <div class="secondary-btn">+ Add Doctor</div>
+  </div>
+
+  @if(loading()){
+  <div class="loading">Loading doctors...</div>
+  }@else {
+  @if(doctors().length !== 0){
+  <div class="doctors-grid">
+    <div *ngFor="let doctor of doctors()" class="doctor-card">
+      <div class="card-header">
+        <h3>{{ doctor.name }}</h3>
+        <span class="status" [ngClass]="{ active: doctor.status === 'Active', inactive: doctor.status !== 'Active' }">
+          {{ doctor.status }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Specification:</span>
+          <span class="value">{{ doctor.specification }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Qualification:</span>
+          <span class="value">{{ doctor.qualification }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Experience:</span>
+          <span class="value">{{ doctor.experience }} years</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Phone:</span>
+          <span class="value">{{ doctor.contactDetails?.phone || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span class="value">{{ doctor.contactDetails?.email || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Commission:</span>
+          <span class="value">{{ doctor.commission }}%</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Shift Time:</span>
+          <span class="value">{{ doctor.shiftStartTime }} - {{ doctor.shiftEndTime }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Weekly Off:</span>
+          <span class="value">{{ doctor.weeklyOff?.[0] || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-sm btn-edit">Edit</button>
+        <button class="btn btn-sm btn-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  }@else {
+  <div class="no-data">
+    No doctors found.
+  </div>
+  }
+  }
+</div>

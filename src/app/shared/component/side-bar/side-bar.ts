@@ -14,12 +14,6 @@ export class SideBar {
 
   coreDepartment = [
     {
-      id: 1,
-      name: 'Admin Management',
-      url: '/admin',
-      icon: 'fas fa-user-cog'
-    },
-    {
       id: 2,
       name: 'Doctor Management',
       url: '/doctors',
