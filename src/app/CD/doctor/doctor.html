@@ -1,7 +1,10 @@
 <div class="doctor-container">
   <div class="doctor-header">
     <h1>Doctor Management</h1>
-    <div class="secondary-btn">+ Add Doctor</div>
+    <button type="button" class="secondary-btn add-doctor-btn" (click)="openAddDoctor()">
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Doctor</span>
+    </button>
   </div>
 
   @if(loading()){

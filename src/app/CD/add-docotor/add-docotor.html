@@ -1,0 +1,127 @@
+<form class="doctor-form" #doctorForm="ngForm" (ngSubmit)="submitForm()">
+  <header class="modal-header">
+    <div>
+      <p>Doctor Profile</p>
+      <h2 class="modal-title">Add Doctor</h2>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close add doctor modal" (click)="closeModal()"></button>
+  </header>
+
+  <div class="modal-body">
+    <div class="profile-strip">
+      <div class="photo-preview">
+        @if (photoPreview) {
+        <img [src]="photoPreview" alt="Doctor profile preview">
+        } @else {
+        <span>{{ formData.name?.slice(0, 2) || 'DR' }}</span>
+        }
+      </div>
+
+      <div class="photo-actions">
+        <h3>{{ formData.name || 'New Doctor' }}</h3>
+        <p>{{ formData.specification || 'Specification' }}</p>
+        <label class="upload-btn">
+          <i class="fa-solid fa-camera"></i>
+          <span>Upload Photo</span>
+          <input type="file" accept="image/*" (change)="onPhotoChange($event)">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <label class="form-field">
+        <span>Doctor ID</span>
+        <input type="text" name="id" [(ngModel)]="formData.id" required>
+      </label>
+
+      <label class="form-field">
+        <span>Name</span>
+        <input type="text" name="name" [(ngModel)]="formData.name" required>
+      </label>
+
+      <label class="form-field">
+        <span>Specification</span>
+        <input type="text" name="specification" [(ngModel)]="formData.specification" required>
+      </label>
+
+      <label class="form-field">
+        <span>Qualification</span>
+        <input type="text" name="qualification" [(ngModel)]="formData.qualification" required>
+      </label>
+
+      <label class="form-field">
+        <span>Experience</span>
+        <input type="number" name="experience" min="0" [(ngModel)]="formData.experience" required>
+      </label>
+
+      <label class="form-field">
+        <span>Commission (%)</span>
+        <input type="number" name="commission" min="0" max="100" [(ngModel)]="formData.commission" required>
+      </label>
+
+      <label class="form-field">
+        <span>Phone</span>
+        <input type="tel" name="phone" [(ngModel)]="formData.contactDetails.phone" required>
+      </label>
+
+      <label class="form-field">
+        <span>Email</span>
+        <input type="email" name="email" [(ngModel)]="formData.contactDetails.email" required>
+      </label>
+
+      <label class="form-field wide">
+        <span>Address</span>
+        <textarea name="address" rows="2" [(ngModel)]="formData.contactDetails.address" required></textarea>
+      </label>
+
+      <label class="form-field">
+        <span>Shift Start</span>
+        <input type="time" name="shiftStartTime" [(ngModel)]="formData.shiftStartTime" required>
+      </label>
+
+      <label class="form-field">
+        <span>Shift End</span>
+        <input type="time" name="shiftEndTime" [(ngModel)]="formData.shiftEndTime" required>
+      </label>
+
+      <label class="form-field">
+        <span>Type</span>
+        <select name="type" [(ngModel)]="formData.type">
+          <option [ngValue]="1">Active</option>
+          <option [ngValue]="0">Inactive</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="weekly-off">
+      <span>Weekly Off</span>
+      <div class="day-list">
+        @for (day of weekDays; track day) {
+        <label class="day-option" [class.selected]="isWeeklyOff(day)">
+          <input type="checkbox" [checked]="isWeeklyOff(day)"
+            (change)="toggleWeeklyOff(day, $any($event.target).checked)">
+          <span>{{ day.slice(0, 3) }}</span>
+        </label>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage) {
+    <div class="save-error">
+      {{ errorMessage }}
+    </div>
+    }
+  </div>
+
+  <footer class="modal-footer modal-actions">
+    <button type="button" class="btn btn-light" [disabled]="saving" (click)="closeModal()">Cancel</button>
+    <button type="submit" class="btn btn-primary" [disabled]="doctorForm.invalid || saving">
+      @if (saving) {
+      Saving...
+      } @else {
+      Save Doctor
+      }
+    </button>
+  </footer>
+</form>
