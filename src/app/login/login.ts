@@ -5,6 +5,7 @@ import { loginReq, loginRes } from './login.model';
 import { SharedService } from '../shared/service/shared-service';
 import { LoginService } from './login.service';
 import { Headers } from '../shared/component/header/headers';
+import { SocketService } from '../shared/service/socket-service';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,8 @@ export class Login implements OnInit {
     public sharedService: SharedService,
     private loginService: LoginService,
     private router: Router,
-    private headersService: Headers
+    private headersService: Headers,
+    private socketService: SocketService
   ) { }
 
   ngOnInit() {
@@ -45,6 +47,7 @@ export class Login implements OnInit {
         this.sharedService.userDetails = res.user;
         this.sharedService.userDepartment = res.department;
         localStorage.setItem('id', res.user.id);
+        this.socketService.connect(res.user.id);
         this.router.navigate(['/']);
       },
       error: (error) => {

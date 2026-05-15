@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.example.com/api' // Adjust as needed for prod
+  apiUrl: 'https://api.example.com/api', // Adjust as needed for prod
+  socketUrl: 'https://api.example.com'
 };

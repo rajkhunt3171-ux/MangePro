@@ -7,7 +7,7 @@ import {
   signal
 } from '@angular/core';
 
-import { SocketService }
+import { OnlineUsersPayload, SocketService }
   from '../shared/service/socket-service';
 
 import { FormsModule }
@@ -38,6 +38,8 @@ interface ChatUser {
   role: string;
   department?: any;
   status: 'online' | 'offline';
+  isOnline?: boolean;
+  lastSeen?: Date | string;
   lastMessage?: string;
   unread?: number;
 }
@@ -65,6 +67,7 @@ export class Chat implements OnInit, OnDestroy {
   messages = signal<ChatMessage[]>([]);
   userId = signal(localStorage.getItem('id') || '');
   conversationId = signal('');
+  searchTerm = signal('');
   allUsers = signal<any[]>([]);
   usersList = signal<any[]>([]);
   selectedUser = signal<ChatUser | null>(null);
@@ -80,6 +83,7 @@ export class Chat implements OnInit, OnDestroy {
 
     // SOCKET CONNECT
     this.socketService.connect(this.userId());
+    this.setupPresenceListeners();
 
     // RECEIVE MESSAGE
     this.socketService.receiveMessage(
@@ -107,8 +111,13 @@ export class Chat implements OnInit, OnDestroy {
   getUser() {
     this.chatService.getAdminUserList().subscribe((res) => {
       if (res.success) {
-        this.allUsers.set(res.data);
-        this.usersList.set(res.data.filter((user: any) => user.id !== this.userId()));
+        const users = Array.isArray(res.data)
+          ? res.data.map((user: any) => this.normalizeUser(user))
+          : [];
+
+        this.allUsers.set(users);
+        this.filterUsers();
+
         const firstUser = this.usersList()[0];
 
         if (firstUser) {
@@ -121,6 +130,120 @@ export class Chat implements OnInit, OnDestroy {
         this.usersList.set([]);
       }
     })
+  }
+
+  onSearchUsers(value: string) {
+    this.searchTerm.set(value);
+    this.filterUsers();
+  }
+
+  private filterUsers() {
+    const search = this.searchTerm().trim().toLowerCase();
+    const users = this.allUsers().filter((user: any) => this.getEntityId(user) !== this.userId());
+
+    if (!search) {
+      this.usersList.set(users);
+      return;
+    }
+
+    this.usersList.set(
+      users.filter((user: any) => {
+        const department = user?.department?.name || user?.department || '';
+        const searchableText = [
+          user?.username,
+          user?.name,
+          user?.role,
+          department
+        ].join(' ').toLowerCase();
+
+        return searchableText.includes(search);
+      })
+    );
+  }
+
+  private setupPresenceListeners() {
+    this.socketService.onlineUsersUpdate((users) => {
+      this.applyOnlineUsers(users);
+    });
+
+    this.socketService.userOnline((userId) => {
+      this.setUserPresence(userId, true);
+    });
+
+    this.socketService.userOffline((userId) => {
+      this.setUserPresence(userId, false);
+    });
+  }
+
+  private normalizeUser(user: any): ChatUser {
+    const isOnline = user?.isOnline === true || user?.status === 'online';
+
+    return {
+      ...user,
+      id: this.getEntityId(user),
+      status: isOnline ? 'online' : 'offline',
+      isOnline
+    };
+  }
+
+  private applyOnlineUsers(payload: OnlineUsersPayload) {
+    const onlineIds = new Set(this.getOnlineUserIds(payload));
+
+    this.allUsers.update((users) =>
+      users.map((user) => ({
+        ...user,
+        isOnline: onlineIds.has(user.id),
+        status: onlineIds.has(user.id) ? 'online' : 'offline'
+      }))
+    );
+
+    this.filterUsers();
+    this.syncSelectedUser();
+  }
+
+  private setUserPresence(userId: string, isOnline: boolean) {
+    if (!userId) {
+      return;
+    }
+
+    this.allUsers.update((users) =>
+      users.map((user) =>
+        user.id === userId
+          ? {
+            ...user,
+            isOnline,
+            status: isOnline ? 'online' : 'offline'
+          }
+          : user
+      )
+    );
+
+    this.filterUsers();
+    this.syncSelectedUser();
+  }
+
+  private syncSelectedUser() {
+    const selectedUser = this.selectedUser();
+
+    if (!selectedUser) {
+      return;
+    }
+
+    const updatedUser = this.allUsers().find((user) => user.id === selectedUser.id);
+
+    if (updatedUser) {
+      this.selectedUser.set(updatedUser);
+    }
+  }
+
+  private getOnlineUserIds(payload: OnlineUsersPayload) {
+    const users = Array.isArray(payload)
+      ? payload
+      : payload?.userIds || payload?.users || [];
+
+    return users
+      .map((user: any) => this.getEntityId(user) || user)
+      .filter(Boolean);
   }
 
   selectUser(user: ChatUser) {
@@ -137,12 +260,10 @@ export class Chat implements OnInit, OnDestroy {
   }
 
   getInitials(name: string) {
-    return name
-      .split(' ')
-      .filter(Boolean)
+    return (name || 'User')
+      .trim()
+      .replace(/\s+/g, '')
       .slice(0, 2)
-      .map((part) => part[0])
-      .join('')
       .toUpperCase();
   }
 
@@ -280,7 +401,8 @@ export class Chat implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.socketService.disconnect();
+    this.socketService.offChatEvents();
+    this.socketService.offPresenceEvents();
   }
 
   private scrollMessagesToBottom() {

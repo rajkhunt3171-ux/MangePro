@@ -9,7 +9,7 @@
 
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Search users">
+      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="onSearchUsers($event)" placeholder="Search users">
     </div>
 
     <div class="user-list">
@@ -24,7 +24,9 @@
         <div class="user-meta">
           <div class="user-row">
             <h3>{{ getDisplayName(user) }}</h3>
-            <span *ngIf="user.unread" class="unread">{{ user.unread }}</span>
+            @if (user.unread) {
+            <span class="unread">{{ user.unread }}</span>
+            }
           </div>
           <p>{{ user.role }} - {{ getDepartmentName(user) }}</p>
           <small>{{ user.lastMessage }}</small>
@@ -36,33 +38,37 @@
 
   <section class="chat-panel">
     <header class="chat-header">
+      <!-- profile icon -->
       <div class="avatar large">
         {{ getInitials(getDisplayName(selectedUser())) }}
       </div>
 
+      <!-- profile details -->
       <div>
         <h1>{{ getDisplayName(selectedUser()) }}</h1>
         <p>
           {{ selectedUser()?.role || 'Conversation' }}
-          <span *ngIf="selectedUser()">- {{ selectedUser()?.status }}</span>
+          @if (selectedUser()) {
+          <span>- {{ selectedUser()?.status }}</span>
+          }
         </p>
       </div>
     </header>
 
     <!-- MESSAGES -->
-
     <div class="messages" #messagesContainer>
       @for (msg of messages(); track $index) {
-      <div class="message-bubble" [class.my-message]="isMyMessage(msg)"
-        [class.other-message]="!isMyMessage(msg)">
+      <div class="message-bubble" [class.my-message]="isMyMessage(msg)" [class.other-message]="!isMyMessage(msg)">
         {{ getMessageText(msg) }}
       </div>
       }
 
-      <div *ngIf="messages().length === 0" class="empty-state">
+      @if (messages().length === 0) {
+      <div class="empty-state">
         <i class="fa-regular fa-comments"></i>
         <p>Select a user and start conversation</p>
       </div>
+      }
     </div>
 
     <!-- INPUT -->
