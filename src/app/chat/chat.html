@@ -1,50 +1,80 @@
 <div class="chat-container">
-  <!-- MESSAGES -->
-
-  <div class="messages">
-    <div
-
-      *ngFor="
-        let msg of messages()
-      "
-
-      [class.my-message]="
-        msg.senderId === userId()
-      "
-
-      [class.other-message]="
-        msg.senderId !== userId()
-      "
-    >
-
-      {{ msg.message }}
-
+  <aside class="chat-users">
+    <div class="users-header">
+      <div>
+        <p>Messages</p>
+        <h2>Conversations</h2>
+      </div>
     </div>
 
-  </div>
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Search users">
+    </div>
 
+    <div class="user-list">
+      @for (user of usersList(); track $index) {
+      <button type="button" class="user-item" [class.active]="selectedUser()?.id === user.id"
+        (click)="selectUser(user)">
+        <div class="avatar">
+          {{ getInitials(getDisplayName(user)) }}
+          <span class="presence" [class.offline]="user.status === 'offline'"></span>
+        </div>
 
+        <div class="user-meta">
+          <div class="user-row">
+            <h3>{{ getDisplayName(user) }}</h3>
+            <span *ngIf="user.unread" class="unread">{{ user.unread }}</span>
+          </div>
+          <p>{{ user.role }} - {{ getDepartmentName(user) }}</p>
+          <small>{{ user.lastMessage }}</small>
+        </div>
+      </button>
+      }
+    </div>
+  </aside>
 
-  <!-- INPUT -->
+  <section class="chat-panel">
+    <header class="chat-header">
+      <div class="avatar large">
+        {{ getInitials(getDisplayName(selectedUser())) }}
+      </div>
 
-  <div class="input-box">
+      <div>
+        <h1>{{ getDisplayName(selectedUser()) }}</h1>
+        <p>
+          {{ selectedUser()?.role || 'Conversation' }}
+          <span *ngIf="selectedUser()">- {{ selectedUser()?.status }}</span>
+        </p>
+      </div>
+    </header>
 
-    <input
-      type="text"
+    <!-- MESSAGES -->
 
-      [ngModel]="message()"
+    <div class="messages" #messagesContainer>
+      @for (msg of messages(); track $index) {
+      <div class="message-bubble" [class.my-message]="isMyMessage(msg)"
+        [class.other-message]="!isMyMessage(msg)">
+        {{ getMessageText(msg) }}
+      </div>
+      }
 
-      (ngModelChange)="message.set($event)"
+      <div *ngIf="messages().length === 0" class="empty-state">
+        <i class="fa-regular fa-comments"></i>
+        <p>Select a user and start conversation</p>
+      </div>
+    </div>
 
-      placeholder="Type message..."
-    >
+    <!-- INPUT -->
 
-    <button
-      (click)="sendMessage()"
-    >
-      Send
-    </button>
+    <div class="input-box">
+      <input type="text" [ngModel]="message()" (ngModelChange)="message.set($event)" (keyup.enter)="sendMessage()"
+        placeholder="Type message...">
 
-  </div>
-
+      <button type="button" (click)="sendMessage()">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span>Send</span>
+      </button>
+    </div>
+  </section>
 </div>

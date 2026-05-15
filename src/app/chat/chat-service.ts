@@ -22,6 +22,11 @@ export class ChatService {
     return this.http.get<T>(`${this.baseUrl}/chat/messages/${conversationId}`);
   }
 
+  //get admin user list
+  getAdminUserList() {
+    return this.http.get<any>(`${this.baseUrl}/auth/adminuser`);
+  }
+
   // GET USER CONVERSATIONS
   getUserConversations<T>(userId: string) {
     return this.http.get<T>(`${this.baseUrl}/chat/conversation/${userId}`);
