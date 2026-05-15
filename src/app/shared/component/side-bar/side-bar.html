@@ -8,6 +8,10 @@
                 <i class="fa-solid fa-house"></i>
                 <span class="sidebar-text">Dashboard</span>
             </a>
+            <a class="sidebar-link" routerLink="/chat">
+                <i class="fa-solid fa-comments"></i>
+                <span class="sidebar-text">Chat</span>
+            </a>
             @if(sharedService?.userDetails?.role=="cd"){
             <a *ngFor="let item of coreDepartment" class="sidebar-link" [routerLink]="item.url">
                 <i class="{{ item?.icon }}"></i>

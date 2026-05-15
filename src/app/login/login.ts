@@ -44,6 +44,7 @@ export class Login implements OnInit {
       next: (res) => {
         this.sharedService.userDetails = res.user;
         this.sharedService.userDepartment = res.department;
+        localStorage.setItem('id', res.user.id);
         this.router.navigate(['/']);
       },
       error: (error) => {

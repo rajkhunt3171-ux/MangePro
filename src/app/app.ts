@@ -29,6 +29,7 @@ export class App {
       next: (res) => {
         this.sharedService.userDetails = res.user;
         this.sharedService.userDepartment = res.department;
+        localStorage.setItem('id', res.user.id);
         if (this.router.url === '/login') {
           this.router.navigate(['/']);
         }
