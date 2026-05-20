@@ -4,6 +4,7 @@ import { Profile } from "../profile/profile";
 import { Doctor } from "../CD/doctor/doctor";
 import { Chat } from "../chat/chat";
 import { PatientList } from "../MD/OPD/patient-list/patient-list";
+import { CreatePatient } from "../MD/OPD/create-patient/create-patient";
 
 export const layOutRoutes: Routes = [
     {
@@ -20,7 +21,16 @@ export const layOutRoutes: Routes = [
     },
     {
         path: 'opd',
-        component: PatientList
+        children: [
+            {
+                path: '',
+                component: PatientList
+            },
+            {
+                path: 'create-patient',
+                component: CreatePatient
+            }
+        ]
     },
     {
         path: 'profile',
