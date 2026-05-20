@@ -17,6 +17,11 @@
                 <i class="{{ item?.icon }}"></i>
                 <span class="sidebar-text">{{ item.name }}</span>
             </a>
+            }@else if (sharedService?.userDetails?.role=="md") {
+            <a *ngFor="let item of medicalDepartment" class="sidebar-link" [routerLink]="item.url">
+                <i class="{{ item?.icon }}"></i>
+                <span class="sidebar-text">{{ item.name }}</span>
+            </a>
             }
         </nav>
         <div class="sidebar-user-details">

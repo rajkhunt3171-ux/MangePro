@@ -3,7 +3,7 @@ import { Home } from "../home/home";
 import { Profile } from "../profile/profile";
 import { Doctor } from "../CD/doctor/doctor";
 import { Chat } from "../chat/chat";
-
+import { PatientList } from "../MD/OPD/patient-list/patient-list";
 
 export const layOutRoutes: Routes = [
     {
@@ -17,6 +17,10 @@ export const layOutRoutes: Routes = [
     {
         path: 'doctors',
         component: Doctor
+    },
+    {
+        path: 'opd',
+        component: PatientList
     },
     {
         path: 'profile',

@@ -1,24 +1,61 @@
 <div class="login-wrapper">
-    <div class="login-card">
-        <div class="header-section">
-            <img src="../../assets/img/logo_new.png" alt="">
-            <p>Please sign in to your account</p>
-        </div>
-        <div class="body-section">
-            <div class="form-section">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input class="input-field" type="text" id="email" placeholder="Enter your email" [(ngModel)]="loginReq.email">
+    <div class="login-shell">
+        <div class="login-filter-panel">
+            <div class="filter-heading">
+                <span>Access Area</span>
+                <strong>Choose Department & Branch</strong>
+            </div>
+
+            <div class="form-group">
+                <label class="filter-label" for="department">
+                    <span>Department</span>
+                </label>
+                <div class="select-control">
+                    <select class="input-field select-field" id="department" [ngModel]="selectedDepartment" (ngModelChange)="onDepartmentChange($event)">
+                        <option value="" disabled>Select department</option>
+                        @for (department of departments; track department.value) {
+                        <option [value]="department.value">{{ department.label }}</option>
+                        }
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input class="input-field" type="password" id="password" placeholder="Enter your password" [(ngModel)]="loginReq.password">
+            </div>
+
+            <div class="form-group">
+                <label class="filter-label" for="branch">
+                    <span>Branch</span>
+                </label>
+                <div class="select-control">
+                    <select class="input-field select-field" id="branch" [(ngModel)]="selectedBranch" [disabled]="!selectedDepartment">
+                        <option value="" disabled>Select branch</option>
+                        @for (branch of branches; track branch.value) {
+                        <option [value]="branch.value">{{ branch.label }}</option>
+                        }
+                    </select>
                 </div>
             </div>
         </div>
-        <div class="footer-section">
-            <div class="submit-btn">
-                <div class="secondary-btn" (click)="login()">Sign In</div>
+
+        <div class="login-card">
+            <div class="header-section">
+                <img src="../../assets/img/logo_new.png" alt="">
+                <p>Please sign in to your account</p>
+            </div>
+            <div class="body-section">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input class="input-field" type="text" id="email" placeholder="Enter your email" [(ngModel)]="loginReq.email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input class="input-field" type="password" id="password" placeholder="Enter your password" [(ngModel)]="loginReq.password">
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section">
+                <div class="submit-btn">
+                    <div class="secondary-btn" (click)="login()">Sign In</div>
+                </div>
             </div>
         </div>
     </div>
