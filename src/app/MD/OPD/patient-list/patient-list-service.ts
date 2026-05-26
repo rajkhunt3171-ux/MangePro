@@ -14,4 +14,8 @@ export class PatientListService {
   getPatientList(): Observable<any> {
     return this.http.get(`${this.baseUrl}/medicaldepartment/opd/get-patient-list`);
   }
+
+  deletePatient(patientId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/medicaldepartment/opd/delete-patient/${encodeURIComponent(patientId)}`);
+  }
 }

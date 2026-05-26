@@ -1,0 +1,28 @@
+<div class="modal-header delete-modal-header">
+  <div>
+    <p class="delete-modal-eyebrow">Delete Patient</p>
+    <h2 class="modal-title">Confirm Delete</h2>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close delete patient modal" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body delete-modal-body">
+  <div class="delete-modal-icon">
+    <i class="fa-regular fa-trash-can"></i>
+  </div>
+  <div>
+    <strong>{{ patient?.name || 'N/A' }}</strong>
+    <p>Patient ID: {{ patient?.patientId || 'N/A' }}</p>
+  </div>
+</div>
+
+@if (errorMessage) {
+<p class="delete-modal-error">{{ errorMessage }}</p>
+}
+
+<div class="modal-footer delete-modal-actions">
+  <button type="button" class="secondary-modal-action" [disabled]="deleting" (click)="activeModal.dismiss()">Cancel</button>
+  <button type="button" class="danger-modal-action" [disabled]="deleting" (click)="confirmDelete()">
+    {{ deleting ? 'Deleting...' : 'Delete' }}
+  </button>
+</div>

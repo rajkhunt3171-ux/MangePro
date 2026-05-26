@@ -1,0 +1,188 @@
+.view-patient-page {
+  color: #111827;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+  padding: 0;
+}
+
+.page-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.eyebrow {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.page-header h1 {
+  color: var(--primary-color);
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.patient-modal-body {
+  padding: 18px;
+}
+
+.patient-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  padding: 18px;
+}
+
+.section-title {
+  align-items: center;
+  border-bottom: 1px solid #edf2f7;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+}
+
+.section-title h2 {
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.section-icon {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  flex: 0 0 38px;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+
+.section-icon.blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.section-icon.amber {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+}
+
+.field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.readonly-value {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 10px 12px;
+  width: 100%;
+  word-break: break-word;
+}
+
+.readonly-value.large {
+  align-items: flex-start;
+  min-height: 96px;
+}
+
+.secondary-action {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #475569;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.secondary-action:hover {
+  background: #f8fafc;
+  color: #111827;
+}
+
+.form-actions {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin: 0 -18px -18px;
+  padding: 14px;
+  position: sticky;
+  bottom: -18px;
+}
+
+@media (max-width: 1100px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .secondary-action {
+    width: 100%;
+  }
+}

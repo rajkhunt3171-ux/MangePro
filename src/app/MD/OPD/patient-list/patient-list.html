@@ -43,6 +43,16 @@
     </div>
 
     <div class="summary-card">
+      <div class="summary-icon orange">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <span class="summary-label">Urgent</span>
+        <strong>{{ urgentPatients }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
       <div class="summary-icon red">
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
@@ -71,11 +81,14 @@
       <table class="patient-table">
         <thead>
           <tr>
-            <th>Patient</th>
+            <th>View</th>
             <th>OPD No.</th>
+            <th>Patient</th>
             <th>Age / Gender</th>
             <th>Doctor</th>
+            <th>Visit Date</th>
             <th>Visit Time</th>
+            <th>Priority</th>
             <th>Status</th>
             <th class="text-end">Action</th>
           </tr>
@@ -83,40 +96,52 @@
         <tbody>
           @if (loading) {
           <tr>
-            <td colspan="7" class="empty-state">Loading patients...</td>
+            <td colspan="10" class="empty-state">Loading patients...</td>
           </tr>
           } @else if (errorMessage) {
           <tr>
-            <td colspan="7" class="empty-state error">{{ errorMessage }}</td>
+            <td colspan="10" class="empty-state error">{{ errorMessage }}</td>
           </tr>
           } @else if (filteredPatients().length === 0) {
           <tr>
-            <td colspan="7" class="empty-state">No patients found.</td>
+            <td colspan="10" class="empty-state">No patients found.</td>
           </tr>
           } @else {
-          @for (patient of filteredPatients(); track getPatientTrack(patient, $index); let i = $index) {
+          @for (patient of filteredPatients(); track $index; let i = $index) {
           <tr>
+            <td>
+              <div class="row-actions view-actions">
+                <button type="button" aria-label="View patient" (click)="openViewPatient(patient)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </td>
+            <td>{{ patient.patientId || 'N/A' }}</td>
             <td>
               <div class="patient-profile">
                 <span [class]="getAvatarClass(i)">{{ getPatientInitials(patient) }}</span>
                 <div>
-                  <strong>{{ getPatientName(patient) }}</strong>
-                  <small>{{ getSymptoms(patient) }}</small>
+                  <strong>{{ patient.name || 'N/A' }}</strong>
                 </div>
               </div>
             </td>
-            <td>{{ getOpdNo(patient) }}</td>
             <td>{{ getAgeGender(patient) }}</td>
-            <td>{{ getDoctorName(patient) }}</td>
+            <td>{{ patient.cdId || 'N/A' }}</td>
+            <td>{{ getVisitDate(patient) }}</td>
             <td>{{ getVisitTime(patient) }}</td>
+            <td><span [class]="'priority ' + (patient.priority || 'Normal').toLowerCase()">{{ patient.priority || 'Normal' }}</span></td>
             <td><span [class]="'status ' + getStatusClass(patient)">{{ getPatientStatus(patient) }}</span></td>
             <td>
               <div class="row-actions">
-                <button type="button" aria-label="View patient">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
                 <button type="button" aria-label="Edit patient">
                   <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button
+                  type="button"
+                  class="danger-action"
+                  aria-label="Delete patient"
+                  (click)="openDeletePatient(patient)">
+                  <i class="fa-regular fa-trash-can"></i>
                 </button>
               </div>
             </td>

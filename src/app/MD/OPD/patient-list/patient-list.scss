@@ -92,6 +92,11 @@
   color: #b45309;
 }
 
+.summary-icon.orange {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
 .summary-icon.red {
   background: #fee2e2;
   color: #b91c1c;
@@ -190,7 +195,7 @@
 
 .patient-table {
   border-collapse: collapse;
-  min-width: 900px;
+  min-width: 1120px;
   width: 100%;
 }
 
@@ -310,10 +315,38 @@
   color: #075985;
 }
 
+.priority {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 10px;
+}
+
+.priority.normal {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.priority.urgent {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.priority.critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .row-actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.row-actions.view-actions {
+  justify-content: flex-start;
 }
 
 .row-actions button {
@@ -334,7 +367,24 @@
   color: #3730a3;
 }
 
+.row-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.row-actions button.danger-action:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
 @media (max-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -1,0 +1,100 @@
+<section class="view-patient-page">
+  <header class="modal-header page-header">
+    <div>
+      <p class="eyebrow">OPD Department</p>
+      <h1>Patient Details</h1>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close patient details modal" (click)="activeModal.dismiss()"></button>
+  </header>
+
+  <div class="modal-body patient-modal-body">
+    <div class="patient-form">
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon blue">
+            <i class="fa-regular fa-user"></i>
+          </span>
+          <h2>Patient Details</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Patient ID</span>
+            <div class="readonly-value">{{ patient?.patientId || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Full Name</span>
+            <div class="readonly-value">{{ patient?.name || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Mobile Number</span>
+            <div class="readonly-value">{{ patient?.number || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Age</span>
+            <div class="readonly-value">{{ patient?.age ?? 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Gender</span>
+            <div class="readonly-value">{{ patient?.gender || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Date of Birth</span>
+            <div class="readonly-value">{{ patient?.dob || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Blood Group</span>
+            <div class="readonly-value">{{ patient?.bloodGroup || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Status</span>
+            <div class="readonly-value">{{ patient?.status || 'N/A' }}</div>
+          </label>
+
+          <label class="field full-width">
+            <span>Address</span>
+            <div class="readonly-value large">{{ patient?.address || 'N/A' }}</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon amber">
+            <i class="fa-solid fa-notes-medical"></i>
+          </span>
+          <h2>Medical Information</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field full-width">
+            <span>Symptoms</span>
+            <div class="readonly-value large">{{ patient?.symptoms || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Allergies</span>
+            <div class="readonly-value">{{ patient?.allergies || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Current Medication</span>
+            <div class="readonly-value">{{ patient?.currentMedication || 'N/A' }}</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-action" (click)="activeModal.close()">Close</button>
+      </div>
+    </div>
+  </div>
+</section>
