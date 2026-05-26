@@ -1,191 +1,197 @@
 <section class="create-patient-page">
-  <div class="page-header">
+  <header class="modal-header page-header">
     <div>
       <p class="eyebrow">OPD Department</p>
       <h1>Add Patient</h1>
     </div>
 
-    <button type="button" class="ghost-action" routerLink="/opd">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Back</span>
-    </button>
+    <button type="button" class="btn-close" aria-label="Close add patient modal" (click)="closeModal()"></button>
+  </header>
+
+  <div class="modal-body patient-modal-body">
+    <div class="patient-form">
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon blue">
+            <i class="fa-regular fa-user"></i>
+          </span>
+          <h2>Patient Details</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Full Name</span>
+            <input type="text" name="name" placeholder="Enter patient name" [(ngModel)]="createPatientReq.name" />
+          </label>
+
+          <label class="field">
+            <span>Mobile Number</span>
+            <input type="tel" name="number" placeholder="Enter mobile number" [(ngModel)]="createPatientReq.number" />
+          </label>
+
+          <label class="field">
+            <span>Age</span>
+            <input type="number" name="age" placeholder="Enter age" [(ngModel)]="createPatientReq.age" />
+          </label>
+
+          <label class="field">
+            <span>Gender</span>
+            <select name="gender" [(ngModel)]="createPatientReq.gender">
+              <option value="" disabled>Select gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Date of Birth</span>
+            <input type="date" name="dob" [(ngModel)]="createPatientReq.dob" />
+          </label>
+
+          <label class="field">
+            <span>Blood Group</span>
+            <select name="bloodGroup" [(ngModel)]="createPatientReq.bloodGroup">
+              <option value="" disabled>Select blood group</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </label>
+
+          <label class="field full-width">
+            <span>Address</span>
+            <textarea name="address" rows="3" placeholder="Enter patient address"
+              [(ngModel)]="createPatientReq.address"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon green">
+            <i class="fa-solid fa-stethoscope"></i>
+          </span>
+          <h2>Visit Details</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Visit Date</span>
+            <input type="date" name="visitDate" [(ngModel)]="createPatientReq.visitDate" />
+          </label>
+
+          <label class="field">
+            <span>Visit Time</span>
+            <input type="time" name="visitTime" [(ngModel)]="createPatientReq.visitTime" />
+          </label>
+
+          <label class="field">
+            <span>Consulting Doctor</span>
+            <select name="cdId" [(ngModel)]="createPatientReq.cdId" (ngModelChange)="setDepartmentFromDoctor($event)">
+              <option value="" disabled>Select doctor</option>
+              @for (doctor of doctors(); track doctor.cdId || doctor.id || doctor._id || doctor.name) {
+              <option [value]="doctor.cdId || doctor.id || doctor._id">
+                {{ doctor.name }}
+              </option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Department</span>
+            <input type="text" name="department" placeholder="Auto filled from doctor"
+              [(ngModel)]="createPatientReq.department" readonly />
+          </label>
+
+          <label class="field">
+            <span>Priority</span>
+            <select name="priority" [(ngModel)]="createPatientReq.priority">
+              <option value="" disabled>Select priority</option>
+              <option>Normal</option>
+              <option>Urgent</option>
+              <option>Critical</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon amber">
+            <i class="fa-solid fa-notes-medical"></i>
+          </span>
+          <h2>Medical Information</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field full-width">
+            <span>Symptoms</span>
+            <textarea name="symptoms" rows="4" placeholder="Enter symptoms"
+              [(ngModel)]="createPatientReq.symptoms"></textarea>
+          </label>
+
+          <label class="field">
+            <span>Allergies</span>
+            <input type="text" name="allergies" placeholder="Enter allergies"
+              [(ngModel)]="createPatientReq.allergies" />
+          </label>
+
+          <label class="field">
+            <span>Current Medication</span>
+            <input type="text" name="currentMedication" placeholder="Enter medication"
+              [(ngModel)]="createPatientReq.currentMedication" />
+          </label>
+
+
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon red">
+            <i class="fa-solid fa-phone-volume"></i>
+          </span>
+          <h2>Emergency Contact</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Contact Name</span>
+            <input type="text" name="emergencyContactName" placeholder="Enter contact name"
+              [(ngModel)]="createPatientReq.emergencyContactName" />
+          </label>
+
+          <label class="field">
+            <span>Relation</span>
+            <input type="text" name="emergencyContactRelation" placeholder="Enter relation"
+              [(ngModel)]="createPatientReq.emergencyContactRelation" />
+          </label>
+
+          <label class="field">
+            <span>Contact Number</span>
+            <input type="tel" name="emergencyContactNumber" placeholder="Enter contact number"
+              [(ngModel)]="createPatientReq.emergencyContactNumber" />
+          </label>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="secondary-action" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="primary-action" [disabled]="saving" (click)="savePatient()">
+          <i class="fa-regular fa-floppy-disk"></i>
+          <span>{{ saving ? 'Saving...' : 'Save Patient' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
-
-  <form class="patient-form">
-    <div class="form-section">
-      <div class="section-title">
-        <span class="section-icon blue">
-          <i class="fa-regular fa-user"></i>
-        </span>
-        <h2>Patient Details</h2>
-      </div>
-
-      <div class="form-grid">
-        <label class="field">
-          <span>Full Name</span>
-          <input type="text" placeholder="Enter patient name" />
-        </label>
-
-        <label class="field">
-          <span>Mobile Number</span>
-          <input type="tel" placeholder="Enter mobile number" />
-        </label>
-
-        <label class="field">
-          <span>Age</span>
-          <input type="number" placeholder="Enter age" />
-        </label>
-
-        <label class="field">
-          <span>Gender</span>
-          <select>
-            <option selected disabled>Select gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Date of Birth</span>
-          <input type="date" />
-        </label>
-
-        <label class="field">
-          <span>Blood Group</span>
-          <select>
-            <option selected disabled>Select blood group</option>
-            <option>A+</option>
-            <option>A-</option>
-            <option>B+</option>
-            <option>B-</option>
-            <option>AB+</option>
-            <option>AB-</option>
-            <option>O+</option>
-            <option>O-</option>
-          </select>
-        </label>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-title">
-        <span class="section-icon green">
-          <i class="fa-solid fa-stethoscope"></i>
-        </span>
-        <h2>Visit Details</h2>
-      </div>
-
-      <div class="form-grid">
-        <label class="field">
-          <span>OPD Number</span>
-          <input type="text" value="OPD-1029" />
-        </label>
-
-        <label class="field">
-          <span>Visit Date</span>
-          <input type="date" />
-        </label>
-
-        <label class="field">
-          <span>Visit Time</span>
-          <input type="time" />
-        </label>
-
-        <label class="field">
-          <span>Consulting Doctor</span>
-          <select>
-            <option selected disabled>Select doctor</option>
-            <option>Dr. Meera Shah</option>
-            <option>Dr. Ravi Desai</option>
-            <option>Dr. Anil Mehta</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Department</span>
-          <select>
-            <option selected>OPD</option>
-            <option>General Medicine</option>
-            <option>Orthopedic</option>
-            <option>Dermatology</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Priority</span>
-          <select>
-            <option selected>Normal</option>
-            <option>Urgent</option>
-            <option>Critical</option>
-          </select>
-        </label>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-title">
-        <span class="section-icon amber">
-          <i class="fa-solid fa-notes-medical"></i>
-        </span>
-        <h2>Medical Information</h2>
-      </div>
-
-      <div class="form-grid">
-        <label class="field full-width">
-          <span>Symptoms</span>
-          <textarea rows="4" placeholder="Enter symptoms"></textarea>
-        </label>
-
-        <label class="field">
-          <span>Allergies</span>
-          <input type="text" placeholder="Enter allergies" />
-        </label>
-
-        <label class="field">
-          <span>Current Medication</span>
-          <input type="text" placeholder="Enter medication" />
-        </label>
-
-        <label class="field full-width">
-          <span>Address</span>
-          <textarea rows="3" placeholder="Enter patient address"></textarea>
-        </label>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="section-title">
-        <span class="section-icon red">
-          <i class="fa-solid fa-phone-volume"></i>
-        </span>
-        <h2>Emergency Contact</h2>
-      </div>
-
-      <div class="form-grid">
-        <label class="field">
-          <span>Contact Name</span>
-          <input type="text" placeholder="Enter contact name" />
-        </label>
-
-        <label class="field">
-          <span>Relation</span>
-          <input type="text" placeholder="Enter relation" />
-        </label>
-
-        <label class="field">
-          <span>Contact Number</span>
-          <input type="tel" placeholder="Enter contact number" />
-        </label>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button type="button" class="secondary-action" routerLink="/opd">Cancel</button>
-      <button type="button" class="primary-action">
-        <i class="fa-regular fa-floppy-disk"></i>
-        <span>Save Patient</span>
-      </button>
-    </div>
-  </form>
 </section>

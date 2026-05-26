@@ -5,7 +5,7 @@
       <h1>Patient List</h1>
     </div>
 
-    <button type="button" class="primary-action" routerLink="/opd/create-patient">
+    <button type="button" class="primary-action" (click)="openCreatePatient()">
       <i class="fa-solid fa-plus"></i>
       <span>New Patient</span>
     </button>
@@ -18,7 +18,7 @@
       </div>
       <div>
         <span class="summary-label">Total Patients</span>
-        <strong>124</strong>
+        <strong>{{ totalPatients }}</strong>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
       </div>
       <div>
         <span class="summary-label">Today Visits</span>
-        <strong>38</strong>
+        <strong>{{ todayVisits }}</strong>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
       </div>
       <div>
         <span class="summary-label">Waiting</span>
-        <strong>12</strong>
+        <strong>{{ waitingPatients }}</strong>
       </div>
     </div>
 
@@ -48,7 +48,7 @@
       </div>
       <div>
         <span class="summary-label">Critical</span>
-        <strong>3</strong>
+        <strong>{{ criticalPatients }}</strong>
       </div>
     </div>
   </div>
@@ -56,13 +56,13 @@
   <div class="toolbar">
     <label class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Search patient" />
+      <input type="text" placeholder="Search patient" [value]="searchText" (input)="setSearchText($any($event.target).value)" />
     </label>
 
     <div class="filters">
-      <button type="button" class="filter active">All</button>
-      <button type="button" class="filter">Waiting</button>
-      <button type="button" class="filter">Consulted</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'All'" (click)="setStatusFilter('All')">All</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Waiting'" (click)="setStatusFilter('Waiting')">Waiting</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Consulted'" (click)="setStatusFilter('Consulted')">Consulted</button>
     </div>
   </div>
 
@@ -81,21 +81,35 @@
           </tr>
         </thead>
         <tbody>
+          @if (loading) {
+          <tr>
+            <td colspan="7" class="empty-state">Loading patients...</td>
+          </tr>
+          } @else if (errorMessage) {
+          <tr>
+            <td colspan="7" class="empty-state error">{{ errorMessage }}</td>
+          </tr>
+          } @else if (filteredPatients().length === 0) {
+          <tr>
+            <td colspan="7" class="empty-state">No patients found.</td>
+          </tr>
+          } @else {
+          @for (patient of filteredPatients(); track getPatientTrack(patient, $index); let i = $index) {
           <tr>
             <td>
               <div class="patient-profile">
-                <span class="avatar">AR</span>
+                <span [class]="getAvatarClass(i)">{{ getPatientInitials(patient) }}</span>
                 <div>
-                  <strong>Arjun Rathod</strong>
-                  <small>Fever, cough</small>
+                  <strong>{{ getPatientName(patient) }}</strong>
+                  <small>{{ getSymptoms(patient) }}</small>
                 </div>
               </div>
             </td>
-            <td>OPD-1024</td>
-            <td>34 / Male</td>
-            <td>Dr. Meera Shah</td>
-            <td>09:20 AM</td>
-            <td><span class="status waiting">Waiting</span></td>
+            <td>{{ getOpdNo(patient) }}</td>
+            <td>{{ getAgeGender(patient) }}</td>
+            <td>{{ getDoctorName(patient) }}</td>
+            <td>{{ getVisitTime(patient) }}</td>
+            <td><span [class]="'status ' + getStatusClass(patient)">{{ getPatientStatus(patient) }}</span></td>
             <td>
               <div class="row-actions">
                 <button type="button" aria-label="View patient">
@@ -107,114 +121,8 @@
               </div>
             </td>
           </tr>
-
-          <tr>
-            <td>
-              <div class="patient-profile">
-                <span class="avatar soft-green">NP</span>
-                <div>
-                  <strong>Nisha Patel</strong>
-                  <small>Routine checkup</small>
-                </div>
-              </div>
-            </td>
-            <td>OPD-1025</td>
-            <td>28 / Female</td>
-            <td>Dr. Ravi Desai</td>
-            <td>09:45 AM</td>
-            <td><span class="status consulted">Consulted</span></td>
-            <td>
-              <div class="row-actions">
-                <button type="button" aria-label="View patient">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-                <button type="button" aria-label="Edit patient">
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div class="patient-profile">
-                <span class="avatar soft-amber">KS</span>
-                <div>
-                  <strong>Kiran Solanki</strong>
-                  <small>Chest pain</small>
-                </div>
-              </div>
-            </td>
-            <td>OPD-1026</td>
-            <td>52 / Male</td>
-            <td>Dr. Anil Mehta</td>
-            <td>10:05 AM</td>
-            <td><span class="status critical">Critical</span></td>
-            <td>
-              <div class="row-actions">
-                <button type="button" aria-label="View patient">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-                <button type="button" aria-label="Edit patient">
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div class="patient-profile">
-                <span class="avatar soft-purple">MB</span>
-                <div>
-                  <strong>Mahesh Bhatt</strong>
-                  <small>Diabetes follow-up</small>
-                </div>
-              </div>
-            </td>
-            <td>OPD-1027</td>
-            <td>61 / Male</td>
-            <td>Dr. Meera Shah</td>
-            <td>10:30 AM</td>
-            <td><span class="status waiting">Waiting</span></td>
-            <td>
-              <div class="row-actions">
-                <button type="button" aria-label="View patient">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-                <button type="button" aria-label="Edit patient">
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div class="patient-profile">
-                <span class="avatar soft-red">JD</span>
-                <div>
-                  <strong>Jinal Dave</strong>
-                  <small>Skin allergy</small>
-                </div>
-              </div>
-            </td>
-            <td>OPD-1028</td>
-            <td>22 / Female</td>
-            <td>Dr. Ravi Desai</td>
-            <td>11:10 AM</td>
-            <td><span class="status checked-in">Checked In</span></td>
-            <td>
-              <div class="row-actions">
-                <button type="button" aria-label="View patient">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-                <button type="button" aria-label="Edit patient">
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
+          }
+          }
         </tbody>
       </table>
     </div>

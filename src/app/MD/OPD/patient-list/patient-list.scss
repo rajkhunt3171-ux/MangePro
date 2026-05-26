@@ -216,6 +216,18 @@
   white-space: nowrap;
 }
 
+.patient-table .empty-state {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.patient-table .empty-state.error {
+  color: #b91c1c;
+}
+
 .patient-profile {
   align-items: center;
   display: flex;

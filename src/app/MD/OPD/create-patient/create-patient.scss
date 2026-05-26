@@ -2,9 +2,9 @@
   color: #111827;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  min-height: 100%;
-  padding: 6px;
+  gap: 0;
+  min-height: 0;
+  padding: 0;
 }
 
 .page-header {
@@ -12,6 +12,7 @@
   display: flex;
   gap: 16px;
   justify-content: space-between;
+  padding: 18px 22px;
 }
 
 .eyebrow {
@@ -66,6 +67,11 @@
   background: #12345c;
 }
 
+.primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .secondary-action {
   background: #ffffff;
   border: 1px solid #d1d5db;
@@ -81,6 +87,10 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.patient-modal-body {
+  padding: 18px;
 }
 
 .form-section {
@@ -171,13 +181,27 @@
   min-height: 44px;
   outline: 0;
   padding: 10px 12px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
   width: 100%;
 }
 
 .field textarea {
   min-height: 96px;
   resize: vertical;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  padding: 12px 14px;
 }
 
 .field input:focus,
@@ -192,13 +216,17 @@
   align-items: center;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin: 0 -18px -18px;
   padding: 14px;
   position: sticky;
-  bottom: 6px;
+  bottom: -18px;
 }
 
 @media (max-width: 1100px) {
@@ -208,7 +236,6 @@
 }
 
 @media (max-width: 768px) {
-  .page-header,
   .form-actions {
     align-items: stretch;
     flex-direction: column;
