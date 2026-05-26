@@ -5,7 +5,27 @@
       <h1>Patient Details</h1>
     </div>
 
-    <button type="button" class="btn-close" aria-label="Close patient details modal" (click)="activeModal.dismiss()"></button>
+    <div class="header-actions">
+      <div class="status-control">
+        <span [class]="'status-badge ' + getStatusClass()">
+          @if (getPatientStatus() === 'Checked In') {
+          <i class="fa-solid fa-circle-check"></i>
+          }
+          <span>{{ getPatientStatus() }}</span>
+        </span>
+        @if (canCheckIn()) {
+        <span class="status-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+        <button type="button" class="check-in-action" (click)="checkInPatient()">
+          <i class="fa-solid fa-user-check"></i>
+          <span>Check In</span>
+        </button>
+        }
+      </div>
+
+      <button type="button" class="btn-close" aria-label="Close patient details modal" (click)="activeModal.dismiss()"></button>
+    </div>
   </header>
 
   <div class="modal-body patient-modal-body">
@@ -52,11 +72,6 @@
           <label class="field">
             <span>Blood Group</span>
             <div class="readonly-value">{{ patient?.bloodGroup || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Status</span>
-            <div class="readonly-value">{{ patient?.status || 'N/A' }}</div>
           </label>
 
           <label class="field full-width">

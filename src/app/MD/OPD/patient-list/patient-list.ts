@@ -181,6 +181,17 @@ export class PatientList implements OnInit {
     return this.getPatientStatus(patient).toLowerCase().replace(/\s+/g, '-');
   }
 
+  checkInPatient(patient: any) {
+    const patientId = patient?.patientId;
+
+    this.patients.update((patients) =>
+      patients.map((item) => {
+        const isCurrentPatient = patientId ? item?.patientId === patientId : item === patient;
+        return isCurrentPatient ? { ...item, status: 'Checked In' } : item;
+      })
+    );
+  }
+
   getTodayDateKey() {
     return this.formatDateKey(new Date());
   }
@@ -235,6 +246,7 @@ export class PatientList implements OnInit {
     });
 
     modalRef.componentInstance.patient = patient;
+    modalRef.componentInstance.onCheckIn = (selectedPatient: any) => this.checkInPatient(selectedPatient);
   }
 
   openDeletePatient(patient: any) {
