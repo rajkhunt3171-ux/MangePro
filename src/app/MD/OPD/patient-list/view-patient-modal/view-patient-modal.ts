@@ -24,7 +24,7 @@ export class ViewPatientModal {
   }
 
   canCheckIn() {
-    return this.getPatientStatus() === 'Waiting';
+    return !!this.onCheckIn && this.getPatientStatus() === 'Waiting';
   }
 
   checkInPatient() {
