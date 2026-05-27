@@ -15,4 +15,8 @@ export class LoginService {
     login(data): Observable<any> {
         return this.http.post<any>(`${this.baseUrl}/auth/login`, data);
     }
+
+    doctorLogin(data): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/auth/doctor-login`, data);
+    }
 }

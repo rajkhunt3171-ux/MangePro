@@ -15,6 +15,10 @@ export class Headers {
     return this.http.get(`${environment.apiUrl}/auth/user-info`);
   }
 
+  getDoctorDetails(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/auth/doctor-profile`);
+  }
+
   logout(): void {
     localStorage.removeItem('authToken');
     localStorage.removeItem('id');

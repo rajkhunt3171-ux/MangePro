@@ -3,7 +3,7 @@
         <div class="login-filter-panel">
             <div class="filter-heading">
                 <span>Access Area</span>
-                <strong>Choose Department & Branch</strong>
+                <strong>Choose Department</strong>
             </div>
 
             <div class="form-group">
@@ -11,24 +11,10 @@
                     <span>Department</span>
                 </label>
                 <div class="select-control">
-                    <select class="input-field select-field" id="department" [ngModel]="selectedDepartment" (ngModelChange)="onDepartmentChange($event)">
-                        <option value="" disabled>Select department</option>
+                    <select class="input-field select-field" id="department" name="department"
+                        [(ngModel)]="selectedDepartment">
                         @for (department of departments; track department.value) {
-                        <option [value]="department.value">{{ department.label }}</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="filter-label" for="branch">
-                    <span>Branch</span>
-                </label>
-                <div class="select-control">
-                    <select class="input-field select-field" id="branch" [(ngModel)]="selectedBranch" [disabled]="!selectedDepartment">
-                        <option value="" disabled>Select branch</option>
-                        @for (branch of branches; track branch.value) {
-                        <option [value]="branch.value">{{ branch.label }}</option>
+                        <option [ngValue]="department.value">{{ department.label }}</option>
                         }
                     </select>
                 </div>
@@ -40,21 +26,40 @@
                 <img src="../../assets/img/logo_new.png" alt="">
                 <p>Please sign in to your account</p>
             </div>
+            @if(selectedDepartment === 0){
             <div class="body-section">
                 <div class="form-section">
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input class="input-field" type="text" id="email" placeholder="Enter your email" [(ngModel)]="loginReq.email">
+                        <input class="input-field" type="text" id="email" placeholder="Enter your email"
+                            [(ngModel)]="loginReq.email">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input class="input-field" type="password" id="password" placeholder="Enter your password" [(ngModel)]="loginReq.password">
+                        <input class="input-field" type="password" id="password" placeholder="Enter your password"
+                            [(ngModel)]="loginReq.password">
                     </div>
                 </div>
             </div>
+            } @else if(selectedDepartment === 1){
+            <div class="body-section">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="doctorId">Doctor ID</label>
+                        <input class="input-field" type="text" id="doctorId" placeholder="Enter doctor ID"
+                            [(ngModel)]="loginReq.username">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorPassword">Password</label>
+                        <input class="input-field" type="password" id="doctorPassword" placeholder="Enter your password"
+                            [(ngModel)]="loginReq.password">
+                    </div>
+                </div>
+            </div>
+            }
             <div class="footer-section">
                 <div class="submit-btn">
-                    <div class="secondary-btn" (click)="login()">Sign In</div>
+                    <div class="secondary-btn" (click)="loginBtnCredentials()">Sign In</div>
                 </div>
             </div>
         </div>

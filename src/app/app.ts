@@ -20,7 +20,11 @@ export class App {
 
   ngOnInit() {
     if (this.sharedService.isLoggedUser()) {
-      this.loadUserDetails();
+      if(localStorage.getItem('type') === "0"){
+        this.loadUserDetails();
+      } else if(localStorage.getItem('type') === "1"){
+        this.loadDoctorDetails();
+      }
     } else {
       this.router.navigate(['/login']);
     }
@@ -40,6 +44,27 @@ export class App {
       },
       error: (error) => {
         console.error('Error fetching user details', error);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('id');
+        this.socketService.disconnect();
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  loadDoctorDetails(){
+    this.headersService.getDoctorDetails().subscribe({
+      next: (res) => {
+        this.sharedService.userDetails = res.doctor;
+        // this.sharedService.userDepartment = res.department;
+        localStorage.setItem('id', res.doctor.id);
+
+        if (this.router.url === '/login') {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching doctor details', error);
         localStorage.removeItem('authToken');
         localStorage.removeItem('id');
         this.socketService.disconnect();

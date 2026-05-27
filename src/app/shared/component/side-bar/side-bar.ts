@@ -12,6 +12,8 @@ import { SharedService } from '../../service/shared-service';
 })
 export class SideBar {
 
+  loginType = localStorage.getItem('type');
+
   coreDepartment = [
     {
       id: 2,
