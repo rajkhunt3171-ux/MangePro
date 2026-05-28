@@ -18,4 +18,8 @@ export class PatientListService {
   deletePatient(patientId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/medicaldepartment/opd/delete-patient/${encodeURIComponent(patientId)}`);
   }
+
+  changePatientStatus(data: { patientId: string; status: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/medicaldepartment/opd/change-patient-status`, data);
+  }
 }

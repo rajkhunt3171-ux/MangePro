@@ -219,6 +219,24 @@ export class PatientListForDoctor implements OnInit {
     });
 
     modalRef.componentInstance.patient = patient;
+    modalRef.componentInstance.onStatusChange = (selectedPatient: any) => this.updatePatientStatus(selectedPatient);
+
+    modalRef.result.then((updatedPatient) => {
+      if (updatedPatient) {
+        this.loadPatients();
+      }
+    }).catch(() => { });
+  }
+
+  updatePatientStatus(patient: any) {
+    const patientId = patient?.patientId;
+
+    this.patients.update((patients) =>
+      patients.map((item) => {
+        const isCurrentPatient = patientId ? item?.patientId === patientId : item === patient;
+        return isCurrentPatient ? { ...item, status: patient?.status } : item;
+      })
+    );
   }
 
   private getPatientPriority(patient: any) {

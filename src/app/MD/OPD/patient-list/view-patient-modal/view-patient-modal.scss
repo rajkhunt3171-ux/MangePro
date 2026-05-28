@@ -173,6 +173,11 @@
   color: #166534;
 }
 
+.status-badge.completed {
+  background: #ecfdf5;
+  color: #047857;
+}
+
 .status-arrow {
   align-items: center;
   animation: arrowNudge 1.3s ease-in-out infinite;
@@ -181,7 +186,26 @@
   font-size: 12px;
 }
 
-.check-in-action {
+.status-arrow.waiting-arrow {
+  color: #f97316;
+}
+
+.contact-admin-message {
+  align-items: center;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #9a3412;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 32px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.status-action {
   align-items: center;
   animation: checkInPulse 1.6s ease-in-out infinite;
   background: #16a34a;
@@ -197,14 +221,63 @@
   white-space: nowrap;
 }
 
-.check-in-action:hover {
+.status-action:hover {
   animation: none;
   background: #15803d;
   transform: translateY(-1px);
 }
 
-.check-in-action i {
+.status-action i {
   font-size: 12px;
+}
+
+.status-action.consult-action {
+  background: #2563eb;
+}
+
+.status-action.consult-action:hover {
+  background: #1d4ed8;
+}
+
+.status-action.complete-action {
+  background: #7c3aed;
+}
+
+.status-action.complete-action:hover {
+  background: #6d28d9;
+}
+
+.status-action.completed-action,
+.status-action.completed-action:hover {
+  animation: none;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  cursor: default;
+  transform: none;
+}
+
+.status-action:disabled {
+  opacity: 1;
+}
+
+.status-action:not(.completed-action):disabled {
+  cursor: wait;
+  filter: saturate(0.85);
+}
+
+.status-error {
+  align-items: center;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 32px;
+  padding: 7px 12px;
 }
 
 @keyframes checkInPulse {

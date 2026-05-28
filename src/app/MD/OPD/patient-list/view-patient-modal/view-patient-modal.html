@@ -13,14 +13,40 @@
           }
           <span>{{ getPatientStatus() }}</span>
         </span>
-        @if (canCheckIn()) {
+        @if (showContactAdmin()) {
+        <span class="status-arrow waiting-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+        <span class="contact-admin-message">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Contact admin</span>
+        </span>
+        }
+        @if (canChangeStatus()) {
         <span class="status-arrow" aria-hidden="true">
           <i class="fa-solid fa-arrow-right"></i>
         </span>
-        <button type="button" class="check-in-action" (click)="checkInPatient()">
-          <i class="fa-solid fa-user-check"></i>
-          <span>Check In</span>
+        <button type="button" [class]="getActionClass()" [disabled]="statusUpdating" (click)="changePatientStatus()">
+          @if (statusUpdating) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Updating</span>
+          } @else {
+          <i [class]="getActionIcon()"></i>
+          <span>{{ getActionLabel() }}</span>
+          }
         </button>
+        }
+        @if (showCompletedButton()) {
+        <button type="button" class="status-action completed-action" disabled>
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Completed</span>
+        </button>
+        }
+        @if (statusErrorMessage) {
+        <span class="status-error">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ statusErrorMessage }}</span>
+        </span>
         }
       </div>
 
