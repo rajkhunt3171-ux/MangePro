@@ -5,6 +5,7 @@ import { Doctor } from '../CD/doctor/doctor';
 import { Chat } from '../chat/chat';
 import { PatientList } from '../MD/OPD/patient-list/patient-list';
 import { PatientListForDoctor } from '../MD/OPD/patient-list-for-doctor/patient-list-for-doctor';
+import { DoctorCalendar } from '../MD/OPD/doctor-calendar/doctor-calendar';
 
 export const layOutRoutes: Routes = [
   {
@@ -31,6 +32,10 @@ export const layOutRoutes: Routes = [
   {
     path: 'patient-list-for-doctor',
     component: PatientListForDoctor,
+  },
+  {
+    path: 'calendar',
+    component: DoctorCalendar,
   },
   {
     path: 'profile',

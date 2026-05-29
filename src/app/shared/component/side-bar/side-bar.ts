@@ -110,4 +110,43 @@ export class SideBar {
 
   ngOnInit() {
   }
+
+  get isDoctorLogin() {
+    return this.loginType === '1';
+  }
+
+  get userName() {
+    return String(this.sharedService?.userDetails?.username || this.sharedService?.userDetails?.name || 'User');
+  }
+
+  get userInitials() {
+    return this.userName
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((name) => name.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  get userDepartmentLabel() {
+    return this.sharedService?.userDepartment?.name || this.sharedService?.userDetails?.specification || 'N/A';
+  }
+
+  get doctorTypeLabel() {
+    const type = Number(this.sharedService?.userDetails?.type);
+
+    if (type === 1) {
+      return 'Regular';
+    }
+
+    if (type === 2) {
+      return 'Visiter';
+    }
+
+    return '';
+  }
+
+  get doctorTypeClass() {
+    return Number(this.sharedService?.userDetails?.type) === 2 ? 'visiter' : 'regular';
+  }
 }

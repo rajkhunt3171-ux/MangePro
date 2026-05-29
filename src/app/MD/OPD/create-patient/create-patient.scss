@@ -212,6 +212,50 @@
   box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
 }
 
+.doctor-type-field {
+  min-width: 0;
+}
+
+.doctor-type-value {
+  align-items: center;
+  display: flex;
+  min-height: 44px;
+}
+
+.doctor-type-value.empty {
+  color: #94a3b8;
+}
+
+.doctor-type-label {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+  min-height: 32px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.doctor-type-label.regular {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.doctor-type-label.visiter {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.doctor-type-placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .form-actions {
   align-items: center;
   background: #ffffff;

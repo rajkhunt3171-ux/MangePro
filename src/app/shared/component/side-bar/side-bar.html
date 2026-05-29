@@ -8,14 +8,19 @@
                 <i class="fa-solid fa-house"></i>
                 <span class="sidebar-text">Dashboard</span>
             </a>
-            @if (loginType !== "1") {
+            @if (!isDoctorLogin) {
             <a class="sidebar-link" routerLink="/chat">
                 <i class="fa-solid fa-comments"></i>
                 <span class="sidebar-text">Chat</span>
             </a>
             }
 
-            @if(loginType === "1"){
+            @if(isDoctorLogin){
+            <a class="sidebar-link" routerLink="/calendar">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span class="sidebar-text">Calendar</span>
+            </a>
+
             <a class="sidebar-link" routerLink="/patient-list-for-doctor">
                 <i class="fa-solid fa-hospital-user"></i>
                 <span class="sidebar-text">Patient</span>
@@ -35,8 +40,20 @@
             }
         </nav>
         <div class="sidebar-user-details">
-            <h1>{{ sharedService?.userDetails?.username ||  sharedService?.userDetails?.name}}</h1>
-            <p><b>Department : </b>{{sharedService?.userDepartment?.name || sharedService?.userDetails?.specification }}</p>
+            <div class="sidebar-user-summary">
+                <div class="sidebar-avatar">{{ userInitials || 'U' }}</div>
+                <div class="sidebar-user-copy">
+                    <h1>{{ userName }}</h1>
+                    <p>{{ userDepartmentLabel }}</p>
+                </div>
+            </div>
+
+            @if (isDoctorLogin && doctorTypeLabel) {
+            <div class="doctor-type-row">
+                <span>Doctor Type</span>
+                <strong [ngClass]="doctorTypeClass">{{ doctorTypeLabel }}</strong>
+            </div>
+            }
         </div>
     </div>
 </div>

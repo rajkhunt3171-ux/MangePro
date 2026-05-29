@@ -1,0 +1,187 @@
+<section class="doctor-leave-page">
+  <div class="leave-header">
+    <div>
+      <p class="eyebrow">Doctor Leave</p>
+      <h1>Leave Calendar</h1>
+    </div>
+
+    <button type="button" class="list-action" [class.active]="showLeaveList" (click)="toggleLeaveList()">
+      <i class="fa-regular fa-rectangle-list"></i>
+      <span>Leave List</span>
+      <strong>{{ totalLeaves }}</strong>
+    </button>
+  </div>
+
+  <div class="leave-summary">
+    <div class="summary-card">
+      <span class="summary-icon blue">
+        <i class="fa-regular fa-calendar"></i>
+      </span>
+      <div>
+        <span>Total Leaves</span>
+        <strong>{{ totalLeaves }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-icon red">
+        <i class="fa-solid fa-user-slash"></i>
+      </span>
+      <div>
+        <span>Unavailable</span>
+        <strong>{{ unavailableLeaves }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-icon amber">
+        <i class="fa-solid fa-kit-medical"></i>
+      </span>
+      <div>
+        <span>Emergency</span>
+        <strong>{{ emergencyLeaves }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-icon green">
+        <i class="fa-regular fa-calendar-check"></i>
+      </span>
+      <div>
+        <span>Weekly Off</span>
+        <strong>{{ weeklyOffLeaves }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="leave-layout">
+    <form class="leave-form-panel" (ngSubmit)="saveLeave()">
+      <div class="panel-header">
+        <div>
+          <span>Leave Entry</span>
+          <strong>{{ doctorName }}</strong>
+        </div>
+        <i class="fa-solid fa-user-clock"></i>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Leave Type</span>
+          <select name="leave_type" [(ngModel)]="leaveForm.leave_type" (ngModelChange)="onLeaveTypeChange()">
+            @for (leaveType of leaveTypes; track leaveType.value) {
+            <option [value]="leaveType.value">{{ leaveType.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Availability</span>
+          <select name="is_available" [(ngModel)]="leaveForm.is_available">
+            @for (option of availabilityOptions; track option.label) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span>From Date</span>
+          <input type="date" name="from_date" [(ngModel)]="leaveForm.from_date" />
+        </label>
+
+        <label class="field">
+          <span>To Date</span>
+          <input type="date" name="to_date" [(ngModel)]="leaveForm.to_date" />
+        </label>
+
+        @if (hasTimeRange()) {
+        <label class="field">
+          <span>From Time</span>
+          <input type="time" name="from_time" [(ngModel)]="leaveForm.from_time" />
+        </label>
+
+        <label class="field">
+          <span>To Time</span>
+          <input type="time" name="to_time" [(ngModel)]="leaveForm.to_time" />
+        </label>
+        }
+
+        <label class="field full-width">
+          <span>Reason</span>
+          <textarea name="reason" rows="3" placeholder="Enter reason" [(ngModel)]="leaveForm.reason"></textarea>
+        </label>
+
+        <label class="field full-width">
+          <span>Note</span>
+          <textarea name="note" rows="3" placeholder="Enter note" [(ngModel)]="leaveForm.note"></textarea>
+        </label>
+      </div>
+
+      <div class="leave-duration">
+        <span>Selected Days</span>
+        <strong>{{ selectedLeaveDays }}</strong>
+      </div>
+
+      @if (errorMessage) {
+      <p class="form-message error">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+      <p class="form-message success">{{ successMessage }}</p>
+      }
+
+      <div class="form-actions">
+        <button type="submit" class="primary-action">
+          <i class="fa-regular fa-floppy-disk"></i>
+          <span>Save Leave</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (showLeaveList) {
+  <div class="drawer-backdrop" (click)="closeLeaveList()"></div>
+  <aside class="leave-list-drawer">
+    <div class="drawer-header">
+      <div>
+        <span>Leave Data</span>
+        <strong>{{ totalLeaves }} records</strong>
+      </div>
+      <button type="button" aria-label="Close leave list" (click)="closeLeaveList()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    @if (sortedLeaves.length === 0) {
+    <div class="empty-state">No leave found.</div>
+    } @else {
+    <div class="leave-list">
+      @for (leave of sortedLeaves; track leave.leave_id) {
+      <article class="leave-card">
+        <div class="leave-card-main">
+          <div>
+            <span class="leave-id">#{{ leave.leave_id }}</span>
+            <span [class]="'leave-type ' + leave.leave_type">{{ getLeaveTypeLabel(leave.leave_type) }}</span>
+            <strong>{{ getLeaveDateRange(leave) }}</strong>
+            <small>{{ getLeaveTimeRange(leave) }}</small>
+            <p>{{ leave.reason || 'No reason added.' }}</p>
+            <p class="note">{{ leave.note || 'No note added.' }}</p>
+          </div>
+          <span [class.available]="leave.is_available" class="availability-badge">
+            {{ getAvailabilityLabel(leave.is_available) }}
+          </span>
+        </div>
+
+        <div class="leave-card-footer">
+          <span>Created: {{ getCreatedDate(leave) }}</span>
+          <button type="button" (click)="removeLeave(leave.leave_id)">
+            <i class="fa-solid fa-trash"></i>
+            <span>Remove</span>
+          </button>
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </aside>
+  }
+</section>

@@ -78,4 +78,22 @@ export class CreatePatient implements OnInit {
   getDoctorId(doctor: any) {
     return doctor?.cdId || doctor?.id || doctor?._id || '';
   }
+
+  get selectedDoctorTypeLabel() {
+    const type = Number(this.selectedDoctor?.type);
+
+    if (type === 1) {
+      return 'Regular';
+    }
+
+    if (type === 2) {
+      return 'Visiter';
+    }
+
+    return '';
+  }
+
+  get selectedDoctorTypeClass() {
+    return Number(this.selectedDoctor?.type) === 2 ? 'visiter' : 'regular';
+  }
 }

@@ -109,6 +109,20 @@
               [(ngModel)]="createPatientReq.department" readonly />
           </label>
 
+          <div class="field doctor-type-field">
+            <span>Doctor Type</span>
+            <div class="doctor-type-value" [class.empty]="!selectedDoctorTypeLabel">
+              @if (selectedDoctorTypeLabel) {
+              <strong class="doctor-type-label" [class.regular]="selectedDoctorTypeClass === 'regular'"
+                [class.visiter]="selectedDoctorTypeClass === 'visiter'">
+                {{ selectedDoctorTypeLabel }}
+              </strong>
+              } @else {
+              <span class="doctor-type-placeholder">Select doctor</span>
+              }
+            </div>
+          </div>
+
           <label class="field">
             <span>Priority</span>
             <select name="priority" [(ngModel)]="createPatientReq.priority">
