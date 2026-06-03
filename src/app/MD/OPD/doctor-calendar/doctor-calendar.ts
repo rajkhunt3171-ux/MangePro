@@ -1,18 +1,19 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SharedService } from '../../../shared/service/shared-service';
+import { DoctorCalendarService } from './doctor-calendar-service';
+import { Headers } from '../../../shared/component/header/headers';
 
 type LeaveType = 'full_day' | 'half_day' | 'emergency' | 'weekly_off';
 
 interface DoctorLeave {
-  leave_id: number;
+  leave_id: string | number;
   leave_type: LeaveType;
   from_date: string;
   to_date: string;
   from_time: string | null;
   to_time: string | null;
   reason: string;
-  note: string;
   is_available: boolean;
   created_at: string;
 }
@@ -24,8 +25,6 @@ interface DoctorLeave {
   styleUrl: './doctor-calendar.scss',
 })
 export class DoctorCalendar implements OnInit {
-  private readonly storageKey = 'leave';
-
   leaves = signal<DoctorLeave[]>([]);
   leaveForm: Omit<DoctorLeave, 'leave_id' | 'created_at'> = {
     leave_type: 'full_day',
@@ -34,13 +33,15 @@ export class DoctorCalendar implements OnInit {
     from_time: null,
     to_time: null,
     reason: '',
-    note: '',
     is_available: false,
   };
 
   errorMessage = '';
   successMessage = '';
   showLeaveList = false;
+  loadingLeaves = false;
+  savingLeave = false;
+  deletingLeaveId: string | number | null = null;
 
   leaveTypes: { label: string; value: LeaveType }[] = [
     { label: 'Full Day', value: 'full_day' },
@@ -54,10 +55,14 @@ export class DoctorCalendar implements OnInit {
     { label: 'Available', value: true },
   ];
 
-  constructor(public sharedService: SharedService) { }
+  constructor(
+    public sharedService: SharedService,
+    private doctorCalendarService: DoctorCalendarService,
+    private headersService: Headers
+  ) { }
 
   ngOnInit() {
-    this.loadLeaves();
+    this.leaves.set(this.sharedService.userDetails?.leave || []);
   }
 
   get doctorName() {
@@ -66,10 +71,6 @@ export class DoctorCalendar implements OnInit {
 
   get totalLeaves() {
     return this.leaves().length;
-  }
-
-  get unavailableLeaves() {
-    return this.leaves().filter((leave) => !leave.is_available).length;
   }
 
   get emergencyLeaves() {
@@ -86,6 +87,34 @@ export class DoctorCalendar implements OnInit {
 
   get sortedLeaves() {
     return [...this.leaves()].sort((first, second) => second.created_at.localeCompare(first.created_at));
+  }
+
+  toggleLeaveList() {
+    this.showLeaveList = !this.showLeaveList;
+  }
+
+  closeLeaveList() {
+    this.showLeaveList = false;
+  }
+
+  private loadLeaves(showLoader = true) {
+    if (showLoader) {
+      this.loadingLeaves = true;
+    }
+    this.errorMessage = '';
+
+    this.headersService.getDoctorDetails().subscribe({
+      next: (res) => {
+        this.leaves.set(res.doctor.leave || []);
+        this.loadingLeaves = false;
+      },
+      error: (err) => {
+        this.loadingLeaves = false;
+        this.leaves.set([]);
+        this.errorMessage = err?.error?.message || 'Leave data load thai nathi.';
+        console.error('Error loading leaves', err);
+      },
+    });
   }
 
   saveLeave() {
@@ -117,36 +146,59 @@ export class DoctorCalendar implements OnInit {
       return;
     }
 
-    const allLeaves = this.getStoredLeaves();
-    const leave: DoctorLeave = {
+    const payload = {
       ...this.leaveForm,
-      leave_id: this.getNextLeaveId(allLeaves),
+      id: localStorage.getItem('id') || '',
       from_time: this.hasTimeRange() ? this.leaveForm.from_time : null,
       to_time: this.hasTimeRange() ? this.leaveForm.to_time : null,
       reason: this.leaveForm.reason.trim(),
-      note: this.leaveForm.note.trim(),
-      created_at: new Date().toISOString(),
     };
 
-    allLeaves.unshift(leave);
-    this.saveAllLeaves(allLeaves);
-    this.leaves.set(allLeaves);
-    this.resetForm();
-    this.successMessage = 'Leave data save thai gayo.';
+    this.savingLeave = true;
+
+    this.doctorCalendarService.createLeave(payload).subscribe({
+      next: (res) => {
+        if(res.success) {
+          this.savingLeave = true;
+          this.resetForm();
+          this.successMessage = 'Leave data save thai gayo.';
+          this.loadLeaves(false);
+        }else{
+          this.savingLeave = true;
+          this.errorMessage = res.message;
+          console.error('Error saving leave', res);
+        }
+      },
+      error: (err) => {
+        this.savingLeave = false;
+        this.errorMessage = err?.error?.message;
+        console.error('Error saving leave', err);
+      },
+    });
   }
 
-  removeLeave(leaveId: number) {
-    const allLeaves = this.getStoredLeaves().filter((leave) => leave.leave_id !== leaveId);
-    this.saveAllLeaves(allLeaves);
-    this.leaves.set(allLeaves);
-  }
+  removeLeave(leaveId: string | number) {
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.deletingLeaveId = leaveId;
 
-  toggleLeaveList() {
-    this.showLeaveList = !this.showLeaveList;
-  }
+    let payload = {
+      id: localStorage.getItem('id') || '',
+      leave_id: leaveId,
+    }
 
-  closeLeaveList() {
-    this.showLeaveList = false;
+    this.doctorCalendarService.deleteLeave(payload).subscribe({
+      next: () => {
+        this.deletingLeaveId = null;
+        this.leaves.update((leaves) => leaves.filter((leave) => String(leave.leave_id) !== String(leaveId)));
+        this.loadLeaves(false);
+      },
+      error: (err) => {
+        this.deletingLeaveId = null;
+        this.errorMessage = err?.error?.message || 'Please try again.';
+        console.error('Error removing leave', err);
+      },
+    });
   }
 
   onLeaveTypeChange() {
@@ -210,42 +262,6 @@ export class DoctorCalendar implements OnInit {
     return isAvailable ? 'Available' : 'Unavailable';
   }
 
-  private loadLeaves() {
-    this.leaves.set(this.getStoredLeaves());
-  }
-
-  private getStoredLeaves(): DoctorLeave[] {
-    const rawLeaves = localStorage.getItem(this.storageKey);
-
-    if (!rawLeaves) {
-      return [];
-    }
-
-    try {
-      const parsedLeaves = JSON.parse(rawLeaves);
-
-      if (Array.isArray(parsedLeaves)) {
-        return parsedLeaves;
-      }
-
-      if (Array.isArray(parsedLeaves?.leave)) {
-        return parsedLeaves.leave;
-      }
-
-      return [];
-    } catch {
-      return [];
-    }
-  }
-
-  private saveAllLeaves(leaves: DoctorLeave[]) {
-    localStorage.setItem(this.storageKey, JSON.stringify(leaves));
-  }
-
-  private getNextLeaveId(leaves: DoctorLeave[]) {
-    return leaves.reduce((maxId, leave) => Math.max(maxId, Number(leave.leave_id) || 0), 0) + 1;
-  }
-
   private resetForm() {
     this.leaveForm = {
       leave_type: 'full_day',
@@ -254,13 +270,20 @@ export class DoctorCalendar implements OnInit {
       from_time: null,
       to_time: null,
       reason: '',
-      note: '',
       is_available: false,
     };
   }
 
   private formatDateForDisplay(dateKey: string) {
+    if (!dateKey) {
+      return 'N/A';
+    }
+
     const [year, month, day] = dateKey.split('-');
+    if (!year || !month || !day) {
+      return dateKey;
+    }
+
     return `${day}/${month}/${year}`;
   }
 }

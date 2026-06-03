@@ -24,16 +24,6 @@
     </div>
 
     <div class="summary-card">
-      <span class="summary-icon red">
-        <i class="fa-solid fa-user-slash"></i>
-      </span>
-      <div>
-        <span>Unavailable</span>
-        <strong>{{ unavailableLeaves }}</strong>
-      </div>
-    </div>
-
-    <div class="summary-card">
       <span class="summary-icon amber">
         <i class="fa-solid fa-kit-medical"></i>
       </span>
@@ -64,21 +54,17 @@
         <i class="fa-solid fa-user-clock"></i>
       </div>
 
+      <div class="leave-duration">
+        <span>Selected Days</span>
+        <strong>{{ selectedLeaveDays }}</strong>
+      </div>
+
       <div class="form-grid">
         <label class="field">
           <span>Leave Type</span>
           <select name="leave_type" [(ngModel)]="leaveForm.leave_type" (ngModelChange)="onLeaveTypeChange()">
             @for (leaveType of leaveTypes; track leaveType.value) {
             <option [value]="leaveType.value">{{ leaveType.label }}</option>
-            }
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Availability</span>
-          <select name="is_available" [(ngModel)]="leaveForm.is_available">
-            @for (option of availabilityOptions; track option.label) {
-            <option [ngValue]="option.value">{{ option.label }}</option>
             }
           </select>
         </label>
@@ -109,16 +95,6 @@
           <span>Reason</span>
           <textarea name="reason" rows="3" placeholder="Enter reason" [(ngModel)]="leaveForm.reason"></textarea>
         </label>
-
-        <label class="field full-width">
-          <span>Note</span>
-          <textarea name="note" rows="3" placeholder="Enter note" [(ngModel)]="leaveForm.note"></textarea>
-        </label>
-      </div>
-
-      <div class="leave-duration">
-        <span>Selected Days</span>
-        <strong>{{ selectedLeaveDays }}</strong>
       </div>
 
       @if (errorMessage) {
@@ -130,9 +106,9 @@
       }
 
       <div class="form-actions">
-        <button type="submit" class="primary-action">
+        <button type="submit" class="primary-action" [disabled]="savingLeave">
           <i class="fa-regular fa-floppy-disk"></i>
-          <span>Save Leave</span>
+          <span>{{ savingLeave ? 'Saving...' : 'Save Leave' }}</span>
         </button>
       </div>
     </form>
@@ -151,7 +127,9 @@
       </button>
     </div>
 
-    @if (sortedLeaves.length === 0) {
+    @if (loadingLeaves) {
+    <div class="empty-state">Loading leave data...</div>
+    } @else if (sortedLeaves.length === 0) {
     <div class="empty-state">No leave found.</div>
     } @else {
     <div class="leave-list">
@@ -164,7 +142,6 @@
             <strong>{{ getLeaveDateRange(leave) }}</strong>
             <small>{{ getLeaveTimeRange(leave) }}</small>
             <p>{{ leave.reason || 'No reason added.' }}</p>
-            <p class="note">{{ leave.note || 'No note added.' }}</p>
           </div>
           <span [class.available]="leave.is_available" class="availability-badge">
             {{ getAvailabilityLabel(leave.is_available) }}
@@ -173,9 +150,9 @@
 
         <div class="leave-card-footer">
           <span>Created: {{ getCreatedDate(leave) }}</span>
-          <button type="button" (click)="removeLeave(leave.leave_id)">
+          <button type="button" [disabled]="deletingLeaveId === leave.leave_id" (click)="removeLeave(leave.leave_id)">
             <i class="fa-solid fa-trash"></i>
-            <span>Remove</span>
+            <span>{{ deletingLeaveId === leave.leave_id ? 'Removing...' : 'Remove' }}</span>
           </button>
         </div>
       </article>
