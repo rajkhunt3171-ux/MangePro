@@ -1,0 +1,248 @@
+<section class="ward-management-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">IPD Department</p>
+      <h1>Ward & Bed Management</h1>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card action-card">
+      <span class="summary-icon blue">
+        <i class="fa-solid fa-hospital"></i>
+      </span>
+      <div>
+        <span class="summary-label">Total Wards</span>
+        <strong>{{ totalWards }}</strong>
+      </div>
+      <button type="button" class="primary-action" (click)="openAddWard()">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Ward</span>
+      </button>
+    </div>
+
+    <div class="summary-card action-card">
+      <span class="summary-icon amber">
+        <i class="fa-solid fa-door-open"></i>
+      </span>
+      <div>
+        <span class="summary-label">Total Rooms</span>
+        <strong>{{ totalRooms }}</strong>
+      </div>
+      
+      <button type="button" class="primary-action" (click)="openAddRoom()">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Room</span>
+      </button>
+    </div>
+
+    <div class="summary-card action-card">
+      <span class="summary-icon green">
+        <i class="fa-solid fa-bed"></i>
+      </span>
+      <div>
+        <span class="summary-label">Total Beds</span>
+        <strong>{{ totalBeds }}</strong>
+      </div>
+      <button type="button" class="primary-action" (click)="openAddBed()">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Bed</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="management-tabs">
+    <div class="tab-list" role="tablist" aria-label="Ward management tabs">
+      <button
+        type="button"
+        class="tab-button"
+        role="tab"
+        [class.active]="activeTab === 'ward'"
+        [attr.aria-selected]="activeTab === 'ward'"
+        (click)="setActiveTab('ward')"
+      >
+        <span>Ward</span>
+        <small>{{ totalWards }}</small>
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        role="tab"
+        [class.active]="activeTab === 'room'"
+        [attr.aria-selected]="activeTab === 'room'"
+        (click)="setActiveTab('room')"
+      >
+        <span>Room</span>
+        <small>{{ totalRooms }}</small>
+      </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        role="tab"
+        [class.active]="activeTab === 'bed'"
+        [attr.aria-selected]="activeTab === 'bed'"
+        (click)="setActiveTab('bed')"
+      >
+        <span>Bed</span>
+        <small>{{ totalBeds }}</small>
+      </button>
+    </div>
+
+    <div class="tab-panel">
+      @if (activeTab === 'ward') {
+      <div class="tab-panel-header">
+        <div>
+          <p>Ward list and ward related details.</p>
+        </div>
+      </div>
+      
+      @if (loadingWards) {
+      <p class="empty-text">Loading wards...</p>
+      } @else if (wardErrorMessage) {
+      <p class="error-text">{{ wardErrorMessage }}</p>
+      } @else if (wards().length) {
+      <div class="table-wrap">
+        <table class="ward-table">
+          <thead>
+            <tr>
+              <th>Sr No.</th>
+              <th>ID</th>
+              <th>Name</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ward of wards(); track ward.id || ward.name; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ ward.id || '-' }}</td>
+              <td>{{ ward.name }}</td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="danger-action"
+                    aria-label="Delete ward"
+                    [disabled]="deletingWardId === ward.id"
+                    (click)="deleteWard(ward)"
+                  >
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <p class="empty-text">No ward added.</p>
+      }
+      } @else if (activeTab === 'room') {
+      <div class="tab-panel-header">
+        <div>
+          <h2>Room</h2>
+          <p>Room list and room allocation details.</p>
+        </div>
+      </div>
+
+      @if (loadingRooms) {
+      <p class="empty-text">Loading rooms...</p>
+      } @else if (roomErrorMessage) {
+      <p class="error-text">{{ roomErrorMessage }}</p>
+      } @else if (rooms().length) {
+      <div class="table-wrap">
+        <table class="ward-table">
+          <thead>
+            <tr>
+              <th>Sr No.</th>
+              <th>Ward ID</th>
+              <th>Room Name</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (room of rooms(); track room.id || room.name || $index; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ room.wardId || '-' }}</td>
+              <td>{{ room.name || '-' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="danger-action"
+                    aria-label="Delete room"
+                    [disabled]="deletingRoomId === room.id"
+                    (click)="deleteRoom(room)"
+                  >
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <p class="empty-text">No room added.</p>
+      }
+      } @else {
+      <div class="tab-panel-header">
+        <div>
+          <h2>Bed</h2>
+          <p>Bed list and bed availability details.</p>
+        </div>
+      </div>
+
+      @if (loadingBeds) {
+      <p class="empty-text">Loading beds...</p>
+      } @else if (bedErrorMessage) {
+      <p class="error-text">{{ bedErrorMessage }}</p>
+      } @else if (beds().length) {
+      <div class="table-wrap">
+        <table class="ward-table">
+          <thead>
+            <tr>
+              <th>Sr No.</th>
+              <th>Ward ID</th>
+              <th>Room ID</th>
+              <th>Bed Name</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bed of beds(); track bed.id || bed.name || $index; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ bed.wardId || '-' }}</td>
+              <td>{{ bed.roomId || '-' }}</td>
+              <td>{{ bed.name || '-' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="danger-action"
+                    aria-label="Delete bed"
+                    [disabled]="deletingBedId === bed.id"
+                    (click)="deleteBed(bed)"
+                  >
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <p class="empty-text">No bed added.</p>
+      }
+      }
+    </div>
+  </div>
+</section>

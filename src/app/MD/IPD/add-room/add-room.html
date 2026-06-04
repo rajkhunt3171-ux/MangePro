@@ -1,0 +1,51 @@
+<form class="room-form" #roomForm="ngForm" (ngSubmit)="submitRoom()">
+  <header class="modal-header">
+    <div>
+      <p>Room Setup</p>
+      <h2 class="modal-title">Add Room</h2>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close add room modal" (click)="closeModal()"></button>
+  </header>
+
+  <div class="modal-body">
+    <label class="form-field">
+      <span>Ward ID</span>
+      <select name="wardId" required [(ngModel)]="wardId">
+        <option [ngValue]="null" disabled>Select ward ID</option>
+        @for (ward of wards; track ward.id || ward.name) {
+        <option [ngValue]="ward.id">{{ ward.id }} ({{ ward.name }})</option>
+        }
+      </select>
+    </label>
+
+    <label class="form-field">
+      <span>Room Name</span>
+      <input
+        type="text"
+        name="roomName"
+        placeholder="Enter room name"
+        maxlength="60"
+        required
+        [(ngModel)]="roomName"
+      >
+    </label>
+
+    @if (errorMessage) {
+    <div class="save-error">
+      {{ errorMessage }}
+    </div>
+    }
+  </div>
+
+  <footer class="modal-footer modal-actions">
+    <button type="button" class="btn btn-light" [disabled]="saving" (click)="closeModal()">Cancel</button>
+    <button type="submit" class="btn btn-primary" [disabled]="roomForm.invalid || !roomName.trim() || !wardId || saving">
+      @if (saving) {
+      Saving...
+      } @else {
+      Save Room
+      }
+    </button>
+  </footer>
+</form>

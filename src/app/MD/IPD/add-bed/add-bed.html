@@ -1,0 +1,61 @@
+<form class="bed-form" #bedForm="ngForm" (ngSubmit)="submitBed()">
+  <header class="modal-header">
+    <div>
+      <p>Bed Setup</p>
+      <h2 class="modal-title">Add Bed</h2>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close add bed modal" (click)="closeModal()"></button>
+  </header>
+
+  <div class="modal-body">
+    <label class="form-field">
+      <span>Ward ID</span>
+      <select name="wardId" required [ngModel]="wardId" (ngModelChange)="onWardChange($event)">
+        <option [ngValue]="null" disabled>Select ward ID</option>
+        @for (ward of wards; track ward.id || ward.name) {
+        <option [ngValue]="ward.id">{{ ward.id }} ({{ ward.name }})</option>
+        }
+      </select>
+    </label>
+
+    <label class="form-field">
+      <span>Room ID</span>
+      <select name="roomId" required [disabled]="!wardId" [(ngModel)]="roomId">
+        <option [ngValue]="null" disabled>Select room ID</option>
+        @for (room of filteredRooms; track room.id || room.name) {
+        <option [ngValue]="room.id">{{ room.id }} ({{ room.name || 'Room' }})</option>
+        }
+      </select>
+    </label>
+
+    <label class="form-field">
+      <span>Bed Name</span>
+      <input
+        type="text"
+        name="bedName"
+        placeholder="Enter bed name"
+        maxlength="60"
+        required
+        [(ngModel)]="bedName"
+      >
+    </label>
+
+    @if (errorMessage) {
+    <div class="save-error">
+      {{ errorMessage }}
+    </div>
+    }
+  </div>
+
+  <footer class="modal-footer modal-actions">
+    <button type="button" class="btn btn-light" [disabled]="saving" (click)="closeModal()">Cancel</button>
+    <button type="submit" class="btn btn-primary" [disabled]="bedForm.invalid || !bedName.trim() || !wardId || !roomId || saving">
+      @if (saving) {
+      Saving...
+      } @else {
+      Save Bed
+      }
+    </button>
+  </footer>
+</form>
