@@ -26,7 +26,14 @@ interface Bed {
   name?: string;
 }
 
-type ManagementTab = 'ward' | 'room' | 'bed';
+interface ChartRow {
+  id?: number | string;
+  label: string;
+  rooms: number;
+  beds: number;
+}
+
+type ManagementTab = 'ward' | 'room' | 'bed' | 'chart';
 
 @Component({
   selector: 'app-ward-management',
@@ -72,6 +79,28 @@ export class WardManagement implements OnInit {
 
   get totalBeds() {
     return this.beds().length;
+  }
+
+  get wardChartRows(): ChartRow[] {
+    return this.wards().map((ward) => {
+      const roomIds = this.rooms()
+        .filter((room) => this.isSameId(room.wardId, ward.id))
+        .map((room) => room.id);
+      const beds = this.beds().filter((bed) =>
+        this.isSameId(bed.wardId, ward.id) || roomIds.some((roomId) => this.isSameId(bed.roomId, roomId))
+      ).length;
+
+      return {
+        id: ward.id,
+        label: ward.name,
+        rooms: roomIds.length,
+        beds,
+      };
+    });
+  }
+
+  get chartMaxValue() {
+    return Math.max(1, ...this.wardChartRows.flatMap((row) => [row.rooms, row.beds]));
   }
 
   setActiveTab(tab: ManagementTab) {
@@ -289,4 +318,9 @@ export class WardManagement implements OnInit {
 
     return this.rooms().find((room) => String(room.id || '') === String(roomId))?.wardId || '';
   }
+
+  private isSameId(first: any, second: any) {
+    return !!first && !!second && String(first) === String(second);
+  }
+
 }

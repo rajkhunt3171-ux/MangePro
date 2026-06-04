@@ -195,21 +195,6 @@
   margin: 4px 0 0;
 }
 
-.secondary-action {
-  align-items: center;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  color: #0f172a;
-  display: inline-flex;
-  font-size: 14px;
-  font-weight: 800;
-  gap: 8px;
-  min-height: 38px;
-  padding: 8px 12px;
-  white-space: nowrap;
-}
-
 .table-wrap {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -277,6 +262,36 @@
   border-color: #fecaca;
 }
 
+.chart-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.chart-row {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.chart-label span,
+.chart-line span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chart-line {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 56px 1fr 28px;
+}
+
+.chart-line progress {
+  width: 100%;
+}
+
 .empty-text {
   color: #64748b;
   margin: 14px 0 0;
@@ -316,8 +331,4 @@
     flex-direction: column;
   }
 
-  .secondary-action {
-    justify-content: center;
-    width: 100%;
-  }
 }
