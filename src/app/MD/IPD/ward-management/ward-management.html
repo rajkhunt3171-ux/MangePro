@@ -99,6 +99,17 @@
       >
         <span>Chart</span>
       </button>
+
+      <button
+        type="button"
+        class="tab-button"
+        role="tab"
+        [class.active]="activeTab === 'visual'"
+        [attr.aria-selected]="activeTab === 'visual'"
+        (click)="setActiveTab('visual')"
+      >
+        <span>Visual</span>
+      </button>
     </div>
 
     <div class="tab-panel">
@@ -253,7 +264,7 @@
       } @else {
       <p class="empty-text">No bed added.</p>
       }
-      } @else {
+      } @else if (activeTab === 'chart') {
       <div class="tab-panel-header">
         <div>
           <h2>Chart</h2>
@@ -290,6 +301,50 @@
       </div>
       } @else {
       <p class="empty-text">No chart data.</p>
+      }
+      } @else {
+      <div class="tab-panel-header">
+        <div>
+          <h2>Visual</h2>
+          <p>Ward filtered room and bed layout.</p>
+        </div>
+
+        <label class="visual-filter">
+          <span>Ward</span>
+          <select [value]="visualWardId" (change)="setVisualWardId($any($event.target).value)">
+            <option value="all">All Wards</option>
+            @for (ward of wards(); track ward.id || ward.name) {
+            <option [value]="ward.id">{{ ward.id || '-' }} ({{ ward.name }})</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (loadingWards || loadingRooms || loadingBeds) {
+      <p class="empty-text">Loading visual...</p>
+      } @else if (visualRooms.length) {
+      <div class="visual-board">
+        @for (room of visualRooms; track room.id || room.name) {
+        <section class="visual-room">
+          <header>
+            <strong>{{ room.name }}</strong>
+            <span>Ward {{ room.wardId || '-' }}</span>
+          </header>
+
+          <div class="visual-beds">
+            @if (room.beds.length) {
+            @for (bed of room.beds; track bed.id || bed.name) {
+            <span class="visual-bed">{{ bed.name || bed.id || '-' }}</span>
+            }
+            } @else {
+            <span class="visual-bed empty">No Bed</span>
+            }
+          </div>
+        </section>
+        }
+      </div>
+      } @else {
+      <p class="empty-text">No visual data.</p>
       }
       }
     </div>

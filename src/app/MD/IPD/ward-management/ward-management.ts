@@ -33,7 +33,14 @@ interface ChartRow {
   beds: number;
 }
 
-type ManagementTab = 'ward' | 'room' | 'bed' | 'chart';
+interface VisualRoom {
+  id?: number | string;
+  name: string;
+  wardId?: string | number;
+  beds: Bed[];
+}
+
+type ManagementTab = 'ward' | 'room' | 'bed' | 'chart' | 'visual';
 
 @Component({
   selector: 'app-ward-management',
@@ -52,6 +59,7 @@ export class WardManagement implements OnInit {
   deletingWardId: string | number | null = null;
   deletingRoomId: string | number | null = null;
   deletingBedId: string | number | null = null;
+  visualWardId: string | number | 'all' = 'all';
   wardErrorMessage = '';
   roomErrorMessage = '';
   bedErrorMessage = '';
@@ -103,8 +111,23 @@ export class WardManagement implements OnInit {
     return Math.max(1, ...this.wardChartRows.flatMap((row) => [row.rooms, row.beds]));
   }
 
+  get visualRooms(): VisualRoom[] {
+    return this.rooms()
+      .filter((room) => this.visualWardId === 'all' || this.isSameId(room.wardId, this.visualWardId))
+      .map((room) => ({
+        id: room.id,
+        name: room.name || String(room.id || 'Room'),
+        wardId: room.wardId,
+        beds: this.beds().filter((bed) => this.isSameId(bed.roomId, room.id)),
+      }));
+  }
+
   setActiveTab(tab: ManagementTab) {
     this.activeTab = tab;
+  }
+
+  setVisualWardId(wardId: string | number | 'all') {
+    this.visualWardId = wardId;
   }
 
   openAddWard() {
