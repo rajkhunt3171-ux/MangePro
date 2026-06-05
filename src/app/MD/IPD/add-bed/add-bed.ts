@@ -52,6 +52,7 @@ export class AddBed {
       roomId: this.roomId,
       wardId: this.wardId,
       name,
+      status: 'available'
     };
 
     this.saving = true;

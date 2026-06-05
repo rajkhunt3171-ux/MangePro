@@ -322,26 +322,80 @@
 
       @if (loadingWards || loadingRooms || loadingBeds) {
       <p class="empty-text">Loading visual...</p>
-      } @else if (visualRooms.length) {
+      } @else if (visualWards.length) {
       <div class="visual-board">
-        @for (room of visualRooms; track room.id || room.name) {
-        <section class="visual-room">
-          <header>
-            <strong>{{ room.name }}</strong>
-            <span>Ward {{ room.wardId || '-' }}</span>
-          </header>
+        <ul class="visual-tree" aria-label="Ward room bed visual tree">
+          @for (ward of visualWards; track ward.id || ward.name) {
+          <li class="visual-tree-item">
+            <div class="visual-node ward-node">
+              <span>Ward</span>
+              <strong>{{ ward.name || ward.id || '-' }}</strong>
+              <small>{{ ward.id || '-' }}</small>
+            </div>
 
-          <div class="visual-beds">
-            @if (room.beds.length) {
-            @for (bed of room.beds; track bed.id || bed.name) {
-            <span class="visual-bed">{{ bed.name || bed.id || '-' }}</span>
-            }
-            } @else {
-            <span class="visual-bed empty">No Bed</span>
-            }
-          </div>
-        </section>
-        }
+            <ul class="visual-tree-children">
+              @if (ward.rooms.length) {
+              @for (room of ward.rooms; track room.id || room.name) {
+              <li class="visual-tree-item">
+                <div class="visual-node room-node">
+                  <span>Room</span>
+                  <strong>{{ room.name || room.id || '-' }}</strong>
+                </div>
+
+                <ul class="visual-tree-children">
+                  @if (room.beds.length) {
+                  @for (bed of room.beds; track bed.id || bed.name) {
+                  <li class="visual-tree-item">
+                    <div
+                      class="visual-node bed-node"
+                      [class.bed-status-available]="bed.status === 'available'"
+                      [class.bed-status-occupied]="bed.status === 'occupied'"
+                      [class.bed-status-reserved]="bed.status === 'reserved'"
+                      [class.bed-status-cleaning]="bed.status === 'cleaning'"
+                      [class.bed-status-maintenance]="bed.status === 'maintenance'"
+                    >
+                      <button type="button" class="bed-info-button" aria-label="View bed details">
+                        <i class="fa-solid fa-info"></i>
+                      </button>
+                      <span>Bed</span>
+                      <strong>{{ bed.name || bed.id || '-' }}</strong>
+                      <small class="bed-status-chip">{{ bed.statusLabel }}</small>
+
+                      <div class="bed-detail-popover" role="tooltip">
+                        <div class="bed-detail-title">Bed Details</div>
+                        @for (detail of bed.details; track detail.label) {
+                        <div class="bed-detail-row">
+                          <span>{{ detail.label }}</span>
+                          <strong>{{ detail.value }}</strong>
+                        </div>
+                        }
+                      </div>
+                    </div>
+                  </li>
+                  }
+                  } @else {
+                  <li class="visual-tree-item">
+                    <div class="visual-node muted-node">
+                      <span>Bed</span>
+                      <strong>No Bed</strong>
+                    </div>
+                  </li>
+                  }
+                </ul>
+              </li>
+              }
+              } @else {
+              <li class="visual-tree-item">
+                <div class="visual-node muted-node">
+                  <span>Room</span>
+                  <strong>No Room</strong>
+                </div>
+              </li>
+              }
+            </ul>
+          </li>
+          }
+        </ul>
       </div>
       } @else {
       <p class="empty-text">No visual data.</p>

@@ -19,11 +19,25 @@ interface Ward {
   name: string;
 }
 
+interface BedDetail {
+  label: string;
+  value: string | number;
+}
+
+export const BED_STATUSES = ['available', 'occupied', 'reserved', 'cleaning', 'maintenance'] as const;
+type BedStatus = typeof BED_STATUSES[number];
+
 interface Bed {
   id?: number | string;
   wardId?: string | number;
   roomId?: string | number;
   name?: string;
+  status: BedStatus;
+  statusLabel: string;
+  statusClass: string;
+  type?: string;
+  patientName?: string;
+  details: BedDetail[];
 }
 
 interface ChartRow {
@@ -38,6 +52,12 @@ interface VisualRoom {
   name: string;
   wardId?: string | number;
   beds: Bed[];
+}
+
+interface VisualWard {
+  id?: number | string;
+  name: string;
+  rooms: VisualRoom[];
 }
 
 type ManagementTab = 'ward' | 'room' | 'bed' | 'chart' | 'visual';
@@ -111,14 +131,20 @@ export class WardManagement implements OnInit {
     return Math.max(1, ...this.wardChartRows.flatMap((row) => [row.rooms, row.beds]));
   }
 
-  get visualRooms(): VisualRoom[] {
-    return this.rooms()
-      .filter((room) => this.visualWardId === 'all' || this.isSameId(room.wardId, this.visualWardId))
-      .map((room) => ({
-        id: room.id,
-        name: room.name || String(room.id || 'Room'),
-        wardId: room.wardId,
-        beds: this.beds().filter((bed) => this.isSameId(bed.roomId, room.id)),
+  get visualWards(): VisualWard[] {
+    return this.wards()
+      .filter((ward) => this.visualWardId === 'all' || this.isSameId(ward.id, this.visualWardId))
+      .map((ward) => ({
+        id: ward.id,
+        name: ward.name || String(ward.id || 'Ward'),
+        rooms: this.rooms()
+          .filter((room) => this.isSameId(room.wardId, ward.id))
+          .map((room) => ({
+            id: room.id,
+            name: room.name || String(room.id || 'Room'),
+            wardId: room.wardId,
+            beds: this.beds().filter((bed) => this.isSameId(bed.roomId, room.id)),
+          })),
       }));
   }
 
@@ -326,12 +352,59 @@ export class WardManagement implements OnInit {
   }
 
   private normalizeBedList(bedList: any[]): Bed[] {
-    return bedList.map((bed) => ({
-      id: bed?.id || bed?._id || bed?.bedId,
-      wardId: bed?.wardId || bed?.wardID || bed?.ward?.id || bed?.ward?._id || this.getWardIdByRoomId(bed?.roomId || bed?.roomID || bed?.room?.id || bed?.room?._id),
-      roomId: bed?.roomId || bed?.roomID || bed?.room?.id || bed?.room?._id,
-      name: bed?.name || bed?.bedName || '',
-    })).filter((bed) => bed.name);
+    return bedList.map((bed) => {
+      const roomId = bed?.roomId || bed?.roomID || bed?.room?.id || bed?.room?._id;
+      const wardId = bed?.wardId || bed?.wardID || bed?.ward?.id || bed?.ward?._id || this.getWardIdByRoomId(roomId);
+      const normalizedBed: Bed = {
+        id: bed?.id || bed?._id || bed?.bedId,
+        wardId,
+        roomId,
+        name: bed?.name || bed?.bedName || '',
+        status: this.getBedStatus(bed?.status || bed?.bedStatus || bed?.availabilityStatus),
+        statusLabel: '',
+        statusClass: '',
+        type: bed?.type || bed?.bedType,
+        patientName: bed?.patientName || bed?.patient?.name,
+        details: [],
+      };
+
+      normalizedBed.statusLabel = this.toTitleCase(normalizedBed.status);
+      normalizedBed.statusClass = `bed-status-${normalizedBed.status}`;
+      normalizedBed.details = this.getBedDetails(normalizedBed);
+
+      return normalizedBed;
+    }).filter((bed) => bed.name);
+  }
+
+  private getBedDetails(bed: Bed): BedDetail[] {
+    const details: BedDetail[] = [
+      { label: 'Bed ID', value: bed.id || '-' },
+      { label: 'Ward ID', value: bed.wardId || '-' },
+      { label: 'Room ID', value: bed.roomId || '-' },
+    ];
+
+    details.push({ label: 'Status', value: bed.statusLabel });
+
+    if (bed.type) {
+      details.push({ label: 'Type', value: bed.type });
+    }
+
+    if (bed.patientName) {
+      details.push({ label: 'Patient', value: bed.patientName });
+    }
+
+    return details;
+  }
+
+  private getBedStatus(status: any): BedStatus {
+    const normalizedStatus = String(status || '').trim().toLowerCase();
+    const matchedStatus = BED_STATUSES.find((bedStatus) => bedStatus === normalizedStatus);
+
+    return matchedStatus || 'available';
+  }
+
+  private toTitleCase(value: string) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
   }
 
   private getWardIdByRoomId(roomId: any) {
