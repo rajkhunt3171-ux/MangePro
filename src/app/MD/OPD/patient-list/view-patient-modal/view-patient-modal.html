@@ -13,6 +13,7 @@
           }
           <span>{{ getPatientStatus() }}</span>
         </span>
+
         @if (showContactAdmin()) {
         <span class="status-arrow waiting-arrow" aria-hidden="true">
           <i class="fa-solid fa-arrow-right"></i>
@@ -26,7 +27,7 @@
         <span class="status-arrow" aria-hidden="true">
           <i class="fa-solid fa-arrow-right"></i>
         </span>
-        <button type="button" [class]="getActionClass()" [disabled]="statusUpdating" (click)="changePatientStatus()">
+        <button type="button" [class]="getActionClass()" [disabled]="statusUpdating || isCompleteDisabled()" (click)="changePatientStatus()">
           @if (statusUpdating) {
           <i class="fa-solid fa-spinner fa-spin"></i>
           <span>Updating</span>
@@ -48,9 +49,27 @@
           <span>{{ statusErrorMessage }}</span>
         </span>
         }
+        @if (showAdmitButton()) {
+        <button type="button" class="status-action admit-action" [disabled]="admitUpdating" (click)="admitPatient()">
+          @if (admitUpdating) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Admitting</span>
+          } @else {
+          <i class="fa-solid fa-bed-pulse"></i>
+          <span>Admit</span>
+          }
+        </button>
+        }
+        @if (isPatientAdmitted()) {
+        <span class="admitted-tag">
+          <i class="fa-solid fa-bed-pulse"></i>
+          <span>Admitted</span>
+        </span>
+        }
       </div>
 
-      <button type="button" class="btn-close" aria-label="Close patient details modal" (click)="activeModal.dismiss()"></button>
+      <button type="button" class="btn-close" aria-label="Close patient details modal"
+        (click)="activeModal.dismiss()"></button>
     </div>
   </header>
 

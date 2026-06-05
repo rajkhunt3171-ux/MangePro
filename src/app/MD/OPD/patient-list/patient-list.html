@@ -23,6 +23,16 @@
     </div>
 
     <div class="summary-card">
+      <div class="summary-icon teal">
+        <i class="fa-solid fa-bed-pulse"></i>
+      </div>
+      <div>
+        <span class="summary-label">Total Admit Patients</span>
+        <strong>{{ totalAdmitPatients }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
       <div class="summary-icon green">
         <i class="fa-solid fa-calendar-check"></i>
       </div>
@@ -90,21 +100,22 @@
             <th>Visit Time</th>
             <th>Priority</th>
             <th>Status</th>
+            <th>Admit</th>
             <th class="text-end">Action</th>
           </tr>
         </thead>
         <tbody>
           @if (loading) {
           <tr>
-            <td colspan="10" class="empty-state">Loading patients...</td>
+            <td colspan="11" class="empty-state">Loading patients...</td>
           </tr>
           } @else if (errorMessage) {
           <tr>
-            <td colspan="10" class="empty-state error">{{ errorMessage }}</td>
+            <td colspan="11" class="empty-state error">{{ errorMessage }}</td>
           </tr>
           } @else if (filteredPatients().length === 0) {
           <tr>
-            <td colspan="10" class="empty-state">No patients found.</td>
+            <td colspan="11" class="empty-state">No patients found.</td>
           </tr>
           } @else {
           @for (patient of filteredPatients(); track $index; let i = $index) {
@@ -131,6 +142,7 @@
             <td>{{ getVisitTime(patient) }}</td>
             <td><span [class]="'priority ' + (patient.priority || 'Normal').toLowerCase()">{{ patient.priority || 'Normal' }}</span></td>
             <td><span [class]="'status ' + getStatusClass(patient)">{{ getPatientStatus(patient) }}</span></td>
+            <td><span [class]="'admit-status ' + getAdmitStatusClass(patient)">{{ getAdmitStatusLabel(patient) }}</span></td>
             <td>
               <div class="row-actions">
                 <button type="button" aria-label="Edit patient">

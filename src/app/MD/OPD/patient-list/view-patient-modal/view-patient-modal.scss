@@ -247,6 +247,37 @@
   background: #6d28d9;
 }
 
+.status-action.complete-action:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.75);
+  opacity: 0.7;
+  transform: none;
+}
+
+.status-action.admit-action {
+  animation: none;
+  background: #0f766e;
+}
+
+.status-action.admit-action:hover {
+  background: #115e59;
+}
+
+.admitted-tag {
+  align-items: center;
+  background: #ccfbf1;
+  border: 1px solid #99f6e4;
+  border-radius: 8px;
+  color: #0f766e;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 32px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
 .status-action.completed-action,
 .status-action.completed-action:hover {
   animation: none;

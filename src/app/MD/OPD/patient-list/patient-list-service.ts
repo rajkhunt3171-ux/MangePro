@@ -22,4 +22,8 @@ export class PatientListService {
   changePatientStatus(data: { patientId: string; status: string }): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/medicaldepartment/opd/change-patient-status`, data);
   }
+
+  admitPatient(data: { patientId: string; idAdmitted: boolean; admissionDate: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/coredepart/ipd/admit-patient`, data);
+  }
 }

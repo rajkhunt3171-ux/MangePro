@@ -43,13 +43,6 @@ interface Bed {
   details: BedDetail[];
 }
 
-interface ChartRow {
-  id?: number | string;
-  label: string;
-  rooms: number;
-  beds: number;
-}
-
 interface VisualRoom {
   id?: number | string;
   name: string;
@@ -63,7 +56,7 @@ interface VisualWard {
   rooms: VisualRoom[];
 }
 
-type ManagementTab = 'ward' | 'room' | 'bed' | 'chart' | 'visual';
+type ManagementTab = 'ward' | 'room' | 'bed' | 'visual';
 
 @Component({
   selector: 'app-ward-management',
@@ -110,28 +103,6 @@ export class WardManagement implements OnInit {
 
   get totalBeds() {
     return this.beds().length;
-  }
-
-  get wardChartRows(): ChartRow[] {
-    return this.wards().map((ward) => {
-      const roomIds = this.rooms()
-        .filter((room) => this.isSameId(room.wardId, ward.id))
-        .map((room) => room.id);
-      const beds = this.beds().filter((bed) =>
-        this.isSameId(bed.wardId, ward.id) || roomIds.some((roomId) => this.isSameId(bed.roomId, roomId))
-      ).length;
-
-      return {
-        id: ward.id,
-        label: ward.name,
-        rooms: roomIds.length,
-        beds,
-      };
-    });
-  }
-
-  get chartMaxValue() {
-    return Math.max(1, ...this.wardChartRows.flatMap((row) => [row.rooms, row.beds]));
   }
 
   get visualWards(): VisualWard[] {

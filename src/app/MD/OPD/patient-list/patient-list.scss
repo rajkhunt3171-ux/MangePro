@@ -87,6 +87,11 @@
   color: #15803d;
 }
 
+.summary-icon.teal {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
 .summary-icon.amber {
   background: #fef3c7;
   color: #b45309;
@@ -195,7 +200,7 @@
 
 .patient-table {
   border-collapse: collapse;
-  min-width: 1120px;
+  min-width: 1220px;
   width: 100%;
 }
 
@@ -318,6 +323,25 @@
 .status.completed {
   background: #ecfdf5;
   color: #047857;
+}
+
+.admit-status {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 10px;
+}
+
+.admit-status.admitted {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.admit-status.not-admitted {
+  background: #f1f5f9;
+  color: #64748b;
 }
 
 .priority {

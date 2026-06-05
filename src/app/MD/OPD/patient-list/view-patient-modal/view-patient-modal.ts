@@ -13,6 +13,7 @@ export class ViewPatientModal {
   @Input() onStatusChange?: (patient: any) => void;
 
   statusUpdating = false;
+  admitUpdating = false;
   statusErrorMessage = '';
 
   constructor(
@@ -51,8 +52,40 @@ export class ViewPatientModal {
     return this.loginType === '1' && this.getPatientStatus() === 'Consulted';
   }
 
+  isCompleteDisabled() {
+    return this.canComplete() && this.isPatientAdmitted();
+  }
+
   showCompletedButton() {
     return this.loginType === '1' && this.getPatientStatus() === 'Completed';
+  }
+
+  showAdmitButton() {
+    return this.getPatientStatus() === 'Consulted' && !this.isPatientAdmitted();
+  }
+
+  isPatientAdmitted() {
+    const admittedValue =
+      this.patient?.idAdmitted ??
+      this.patient?.isAdmitted ??
+      this.patient?.admitted ??
+      this.patient?.is_admitted ??
+      this.patient?.admission?.idAdmitted;
+
+    if (typeof admittedValue === 'boolean') {
+      return admittedValue;
+    }
+
+    const normalizedValue = String(admittedValue ?? '').trim().toLowerCase();
+
+    return (
+      normalizedValue === 'true' ||
+      normalizedValue === '1' ||
+      normalizedValue === 'yes' ||
+      normalizedValue === 'admitted' ||
+      !!this.patient?.admissionDate ||
+      !!this.patient?.admission?.admissionDate
+    );
   }
 
   canChangeStatus() {
@@ -93,7 +126,7 @@ export class ViewPatientModal {
   }
 
   changePatientStatus() {
-    if (this.statusUpdating) {
+    if (this.statusUpdating || this.isCompleteDisabled()) {
       return;
     }
 
@@ -125,6 +158,44 @@ export class ViewPatientModal {
     });
   }
 
+  admitPatient() {
+    if (this.admitUpdating) {
+      return;
+    }
+
+    const patientId = this.patient?.patientId;
+
+    if (!patientId) {
+      this.statusErrorMessage = 'Patient ID missing che.';
+      return;
+    }
+
+    const payload = {
+      patientId,
+      idAdmitted: true,
+      admissionDate: this.getTodayDateKey(),
+    };
+
+    this.admitUpdating = true;
+    this.statusErrorMessage = '';
+
+    this.patientListService.admitPatient(payload).subscribe({
+      next: (res) => {
+        this.admitUpdating = false;
+        this.patient = {
+          ...this.patient,
+          idAdmitted: true,
+          admissionDate: payload.admissionDate,
+        };
+        this.activeModal.close(true);
+      },
+      error: (err) => {
+        this.admitUpdating = false;
+        this.statusErrorMessage = err?.error?.message;
+      },
+    });
+  }
+
   private getNextStatus() {
     if (this.canCheckIn()) {
       return 'Checked In';
@@ -150,6 +221,16 @@ export class ViewPatientModal {
       return 'Completed';
     }
     return 'Waiting';
+  }
+
+  private getTodayDateKey() {
+    const today = new Date();
+
+    return [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
   }
 
 }

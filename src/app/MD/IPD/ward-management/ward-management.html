@@ -93,17 +93,6 @@
         type="button"
         class="tab-button"
         role="tab"
-        [class.active]="activeTab === 'chart'"
-        [attr.aria-selected]="activeTab === 'chart'"
-        (click)="setActiveTab('chart')"
-      >
-        <span>Chart</span>
-      </button>
-
-      <button
-        type="button"
-        class="tab-button"
-        role="tab"
         [class.active]="activeTab === 'visual'"
         [attr.aria-selected]="activeTab === 'visual'"
         (click)="setActiveTab('visual')"
@@ -263,44 +252,6 @@
       </div>
       } @else {
       <p class="empty-text">No bed added.</p>
-      }
-      } @else if (activeTab === 'chart') {
-      <div class="tab-panel-header">
-        <div>
-          <h2>Chart</h2>
-          <p>Ward wise room and bed chart.</p>
-        </div>
-      </div>
-
-      @if (loadingWards || loadingRooms || loadingBeds) {
-      <p class="empty-text">Loading chart...</p>
-      } @else if (wardChartRows.length) {
-      <div class="chart-grid">
-        @for (row of wardChartRows; track row.id || row.label) {
-        <div class="chart-row">
-          <div class="chart-label">
-            <strong>{{ row.label }} </strong>
-            <span>({{ row.id || '-' }})</span>
-          </div>
-
-          <div class="chart-bars">
-            <div class="chart-line">
-              <span>Rooms</span>
-              <progress [max]="chartMaxValue" [value]="row.rooms"></progress>
-              <b>{{ row.rooms }}</b>
-            </div>
-
-            <div class="chart-line">
-              <span>Beds</span>
-              <progress [max]="chartMaxValue" [value]="row.beds"></progress>
-              <b>{{ row.beds }}</b>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
-      } @else {
-      <p class="empty-text">No chart data.</p>
       }
       } @else {
       <div class="tab-panel-header">

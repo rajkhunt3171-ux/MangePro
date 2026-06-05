@@ -48,6 +48,10 @@ export class PatientListForDoctor implements OnInit {
     return this.patients().length;
   }
 
+  get totalAdmitPatients() {
+    return this.patients().filter((patient) => this.isPatientAdmitted(patient)).length;
+  }
+
   get todayVisits() {
     return this.patients().filter((patient) => this.isTodayVisit(patient)).length;
   }
@@ -173,6 +177,38 @@ export class PatientListForDoctor implements OnInit {
 
   getStatusClass(patient: any) {
     return this.getPatientStatus(patient).toLowerCase().replace(/\s+/g, '-');
+  }
+
+  isPatientAdmitted(patient: any) {
+    const admittedValue =
+      patient?.idAdmitted ??
+      patient?.isAdmitted ??
+      patient?.admitted ??
+      patient?.is_admitted ??
+      patient?.admission?.idAdmitted;
+
+    if (typeof admittedValue === 'boolean') {
+      return admittedValue;
+    }
+
+    const normalizedValue = String(admittedValue ?? '').trim().toLowerCase();
+
+    return (
+      normalizedValue === 'true' ||
+      normalizedValue === '1' ||
+      normalizedValue === 'yes' ||
+      normalizedValue === 'admitted' ||
+      !!patient?.admissionDate ||
+      !!patient?.admission?.admissionDate
+    );
+  }
+
+  getAdmitStatusLabel(patient: any) {
+    return this.isPatientAdmitted(patient) ? 'Admitted' : 'Not Admit';
+  }
+
+  getAdmitStatusClass(patient: any) {
+    return this.isPatientAdmitted(patient) ? 'admitted' : 'not-admitted';
   }
 
   getTodayDateKey() {
