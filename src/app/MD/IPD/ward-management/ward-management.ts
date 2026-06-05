@@ -6,6 +6,7 @@ import { AddRoom } from '../add-room/add-room';
 import { AddRoomService } from '../add-room/add-room-service';
 import { AddWard } from '../add-ward/add-ward';
 import { AddWardService } from '../add-ward/add-ward-service';
+import { ViewPatientModal } from '../../OPD/patient-list/view-patient-modal/view-patient-modal';
 
 interface Room {
   id?: number | string;
@@ -36,6 +37,8 @@ interface Bed {
   statusLabel: string;
   statusClass: string;
   type?: string;
+  patient?: any;
+  patientId?: string | number;
   patientName?: string;
   details: BedDetail[];
 }
@@ -154,6 +157,20 @@ export class WardManagement implements OnInit {
 
   setVisualWardId(wardId: string | number | 'all') {
     this.visualWardId = wardId;
+  }
+
+  canShowPatientDetails(bed: Bed) {
+    return bed.status === 'occupied' || bed.status === 'reserved' || this.hasBedPatientDetails(bed);
+  }
+
+  openBedPatientDetails(bed: Bed) {
+    const modalRef = this.modalService.open(ViewPatientModal, {
+      backdrop: 'static',
+      scrollable: true,
+      size: 'xl',
+    });
+
+    modalRef.componentInstance.patient = this.getPatientDetailsFromBed(bed);
   }
 
   openAddWard() {
@@ -355,16 +372,19 @@ export class WardManagement implements OnInit {
     return bedList.map((bed) => {
       const roomId = bed?.roomId || bed?.roomID || bed?.room?.id || bed?.room?._id;
       const wardId = bed?.wardId || bed?.wardID || bed?.ward?.id || bed?.ward?._id || this.getWardIdByRoomId(roomId);
+      const patient = bed?.patient || bed?.assignedPatient || bed?.patientDetails || bed?.admittedPatient;
       const normalizedBed: Bed = {
         id: bed?.id || bed?._id || bed?.bedId,
         wardId,
         roomId,
         name: bed?.name || bed?.bedName || '',
-        status: this.getBedStatus(bed?.status || bed?.bedStatus || bed?.availabilityStatus),
+        status: this.getBedStatus(this.getRawBedStatus(bed)),
         statusLabel: '',
         statusClass: '',
         type: bed?.type || bed?.bedType,
-        patientName: bed?.patientName || bed?.patient?.name,
+        patient,
+        patientId: bed?.patientId || bed?.patientID || patient?.patientId || patient?.id || patient?._id,
+        patientName: bed?.patientName || patient?.name,
         details: [],
       };
 
@@ -403,8 +423,38 @@ export class WardManagement implements OnInit {
     return matchedStatus || 'available';
   }
 
+  private getRawBedStatus(bed: any) {
+    return (
+      bed?.status ||
+      bed?.bedStatus ||
+      bed?.bed_status ||
+      bed?.availabilityStatus ||
+      bed?.availability_status ||
+      bed?.currentStatus ||
+      bed?.current_status ||
+      bed?.statusName ||
+      bed?.status?.name
+    );
+  }
+
   private toTitleCase(value: string) {
     return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  private hasBedPatientDetails(bed: Bed) {
+    return !!(bed.patient || bed.patientId || bed.patientName);
+  }
+
+  private getPatientDetailsFromBed(bed: Bed) {
+    return {
+      ...(bed.patient || {}),
+      patientId: bed.patient?.patientId || bed.patientId || 'N/A',
+      name: bed.patient?.name || bed.patientName || 'N/A',
+      bedName: bed.name || bed.id || 'N/A',
+      bedStatus: bed.statusLabel,
+      wardId: bed.wardId || 'N/A',
+      roomId: bed.roomId || 'N/A',
+    };
   }
 
   private getWardIdByRoomId(roomId: any) {

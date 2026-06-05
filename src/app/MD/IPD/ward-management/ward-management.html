@@ -360,6 +360,16 @@
                       <span>Bed</span>
                       <strong>{{ bed.name || bed.id || '-' }}</strong>
                       <small class="bed-status-chip">{{ bed.statusLabel }}</small>
+                      @if (canShowPatientDetails(bed)) {
+                      <button
+                        type="button"
+                        class="patient-detail-button"
+                        (click)="openBedPatientDetails(bed)"
+                      >
+                        <i class="fa-solid fa-user"></i>
+                        <span>Patient</span>
+                      </button>
+                      }
 
                       <div class="bed-detail-popover" role="tooltip">
                         <div class="bed-detail-title">Bed Details</div>

@@ -446,6 +446,35 @@
   padding: 4px 8px;
 }
 
+.patient-detail-button {
+  align-items: center;
+  background: var(--bed-accent);
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  margin-top: 8px;
+  min-height: 28px;
+  padding: 6px 9px;
+}
+
+.patient-detail-button:hover,
+.patient-detail-button:focus {
+  filter: brightness(0.94);
+  outline: none;
+}
+
+.patient-detail-button span {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+  text-transform: none;
+}
+
 .bed-detail-popover {
   background: #0f172a;
   border-radius: 8px;
