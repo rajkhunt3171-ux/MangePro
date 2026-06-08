@@ -1,9 +1,654 @@
 :root {
-    --primary-color: #0A192F;
-    --secondary-color: #0F2A44;
-    --third-color: white;
-    --black-color: black;
-    --dark-gray-color: #333333;
-    --light-gray-color: #555555;
-    --background-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  --primary-color: #0A192F;
+  --secondary-color: #0F2A44;
+  --third-color: white;
+  --black-color: black;
+  --dark-gray-color: #333333;
+  --light-gray-color: #555555;
+  --background-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+@keyframes bedVisualAvailablePulse {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+
+  60% {
+    opacity: 0;
+    transform: scale(1.13);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.13);
+  }
+}
+
+.bed-visual-modal-window {
+  .modal-dialog {
+    height: calc(100vh - 24px);
+    margin-bottom: 12px;
+    margin-top: 12px;
+    max-width: min(96vw, 1680px);
+  }
+
+  .modal-content {
+    height: 100%;
+  }
+
+  .bed-visual-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 18px;
+  }
+
+  .modal-eyebrow {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+  }
+
+  .bed-visual-header .modal-title {
+    color: var(--primary-color);
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .bed-visual-body {
+    background: #f8fafc;
+    color: #111827;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    overflow: hidden;
+    padding: 12px 16px;
+  }
+
+  .patient-strip,
+  .visual-toolbar,
+  .visual-board,
+  .empty-text,
+  .error-text {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .patient-strip {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .patient-avatar {
+    align-items: center;
+    background: #dbeafe;
+    border-radius: 8px;
+    color: #1d4ed8;
+    display: inline-flex;
+    flex: 0 0 40px;
+    font-size: 13px;
+    font-weight: 900;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+  }
+
+  .patient-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .patient-info small,
+  .visual-node small {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .patient-info strong,
+  .visual-node strong {
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .patient-info span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .patient-bed-pill,
+  .visual-stats span,
+  .legend-item,
+  .bed-status-chip,
+  .bed-patient-chip {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 900;
+    gap: 6px;
+  }
+
+  .patient-bed-pill {
+    background: #ecfeff;
+    border: 1px solid #a5f3fc;
+    color: #0e7490;
+    flex: 0 0 auto;
+    padding: 8px 11px;
+    white-space: nowrap;
+  }
+
+  .visual-toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    padding: 10px 12px;
+  }
+
+  .visual-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .visual-stats span {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    color: #475569;
+    min-height: 30px;
+    padding: 6px 10px;
+  }
+
+  .visual-stats strong {
+    color: #0f172a;
+    font-size: 14px;
+  }
+
+  .primary-modal-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+  }
+
+  .status-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .legend-item {
+    --bed-accent: #15803d;
+    --bed-chip-bg: #dcfce7;
+    background: var(--bed-chip-bg);
+    color: var(--bed-accent);
+    padding: 6px 9px;
+  }
+
+  .legend-item i {
+    background: var(--bed-accent);
+    border-radius: 999px;
+    height: 8px;
+    width: 8px;
+  }
+
+  .visual-board {
+    padding: 18px;
+  }
+
+  .visual-tree,
+  .visual-tree-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .visual-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: max-content;
+  }
+
+  .visual-tree-item {
+    align-items: center;
+    display: flex;
+    position: relative;
+  }
+
+  .visual-tree-children {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 46px;
+    position: relative;
+  }
+
+  .visual-tree-children::before {
+    border-left: 2px solid #94a3b8;
+    bottom: 24px;
+    content: "";
+    left: 22px;
+    position: absolute;
+    top: 24px;
+  }
+
+  .visual-tree-children::after,
+  .visual-tree-children > .visual-tree-item::before {
+    border-top: 2px solid #94a3b8;
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 22px;
+  }
+
+  .visual-tree-children::after {
+    left: 0;
+  }
+
+  .visual-tree-children > .visual-tree-item::before {
+    left: -22px;
+  }
+
+  .visual-node {
+    align-items: flex-start;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 62px;
+    min-width: 136px;
+    padding: 9px 12px;
+    position: relative;
+    transition: 0.16s;
+    z-index: 1;
+  }
+
+  .visual-node span {
+    align-items: center;
+    color: #64748b;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 900;
+    gap: 6px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .ward-node {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .room-node {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+
+  .bed-node {
+    --bed-accent: #15803d;
+    --bed-bg: #ecfdf5;
+    --bed-border: #bbf7d0;
+    --bed-chip-bg: #dcfce7;
+    background: var(--bed-bg);
+    border-color: var(--bed-border);
+    cursor: pointer;
+    min-width: 148px;
+    padding-right: 34px;
+  }
+
+  .bed-node:hover,
+  .bed-node:focus {
+    border-color: var(--bed-accent);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.11);
+    outline: 0;
+    transform: translateY(-1px);
+  }
+
+  .bed-node.disabled-bed {
+    cursor: not-allowed;
+    filter: grayscale(0.25);
+    opacity: 0.62;
+  }
+
+  .bed-node.disabled-bed:hover,
+  .bed-node.disabled-bed:focus {
+    border-color: var(--bed-border);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    transform: none;
+  }
+
+  .bed-status-available {
+    --bed-accent: #15803d;
+    --bed-bg: #ecfdf5;
+    --bed-border: #bbf7d0;
+    --bed-chip-bg: #dcfce7;
+  }
+
+  .bed-node.bed-status-available:not(.selected-bed)::before {
+    animation: bedVisualAvailablePulse 1.8s ease-out infinite;
+    border: 2px solid rgba(22, 163, 74, 0.34);
+    border-radius: 10px;
+    content: "";
+    inset: -5px;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  .bed-node.bed-status-available:not(.selected-bed) .bed-status-chip {
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+  }
+
+  .bed-status-occupied {
+    --bed-accent: #dc2626;
+    --bed-bg: #fef2f2;
+    --bed-border: #fecaca;
+    --bed-chip-bg: #fee2e2;
+  }
+
+  .bed-status-reserved {
+    --bed-accent: #4f46e5;
+    --bed-bg: #eef2ff;
+    --bed-border: #c7d2fe;
+    --bed-chip-bg: #e0e7ff;
+  }
+
+  .bed-status-cleaning {
+    --bed-accent: #0891b2;
+    --bed-bg: #ecfeff;
+    --bed-border: #a5f3fc;
+    --bed-chip-bg: #cffafe;
+  }
+
+  .bed-status-maintenance {
+    --bed-accent: #ea580c;
+    --bed-bg: #fff7ed;
+    --bed-border: #fed7aa;
+    --bed-chip-bg: #ffedd5;
+  }
+
+  .bed-info-icon {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--bed-border);
+    border-radius: 999px;
+    color: var(--bed-accent);
+    display: inline-flex;
+    font-size: 10px;
+    height: 20px;
+    justify-content: center;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
+
+  .bed-status-chip,
+  .bed-patient-chip {
+    background: var(--bed-chip-bg);
+    color: var(--bed-accent);
+    font-size: 11px;
+    line-height: 1.2;
+    margin-top: 6px;
+    max-width: 150px;
+    overflow-wrap: anywhere;
+    padding: 4px 8px;
+  }
+
+  .selected-bed {
+    border-color: #0f766e;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 12px 24px rgba(15, 23, 42, 0.11);
+  }
+
+  .patient-bed::after {
+    background: #0f766e;
+    border-radius: 999px;
+    color: #ffffff;
+    content: "Current";
+    font-size: 10px;
+    font-weight: 900;
+    padding: 4px 7px;
+    position: absolute;
+    right: 8px;
+    top: -10px;
+  }
+
+  .bed-detail-popover {
+    background: #0f172a;
+    border-radius: 8px;
+    bottom: calc(100% + 10px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22);
+    color: #ffffff;
+    display: none;
+    left: 50%;
+    min-width: 190px;
+    padding: 10px 12px;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+
+  .bed-node:hover .bed-detail-popover,
+  .bed-node:focus .bed-detail-popover {
+    display: block;
+  }
+
+  .bed-detail-title {
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .bed-detail-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .bed-detail-row + .bed-detail-row {
+    margin-top: 6px;
+  }
+
+  .bed-detail-row span {
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: none;
+  }
+
+  .bed-detail-row strong {
+    color: #ffffff;
+    font-size: 12px;
+    max-width: 104px;
+    text-align: right;
+  }
+
+  .muted-node {
+    background: #f8fafc;
+    border-style: dashed;
+  }
+
+  .muted-node strong {
+    color: #94a3b8;
+  }
+
+  .empty-text,
+  .error-text {
+    color: #64748b;
+    font-weight: 800;
+    margin: 0;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .error-text {
+    color: #991b1b;
+  }
+
+  .bed-visual-footer {
+    border-top: 1px solid #e5e7eb;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 10px 16px;
+  }
+
+  .selected-bed-summary {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin-right: auto;
+    min-width: 0;
+  }
+
+  .selected-bed-summary span {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .selected-bed-summary strong {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .selected-bed-summary small {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .allocation-status-actions {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin-right: auto;
+  }
+
+  .status-action {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 900;
+    justify-content: center;
+    min-height: 38px;
+    min-width: 104px;
+    padding: 8px 12px;
+  }
+
+  .status-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .occupied-action {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+  }
+
+  .reserved-action {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #4f46e5;
+  }
+
+  .status-action.active {
+    color: #ffffff;
+  }
+
+  .occupied-action.active {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+
+  .reserved-action.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+  }
+
+  .allocation-error-text {
+    color: #b91c1c;
+    flex: 1 1 100%;
+    font-size: 12px;
+    font-weight: 800;
+    margin: 0;
+    text-align: right;
+  }
+
+  .secondary-modal-action,
+  .primary-modal-action {
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 900;
+    min-height: 38px;
+    min-width: 92px;
+    padding: 8px 14px;
+  }
+
+  .secondary-modal-action {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+  }
+
+  .primary-modal-action {
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .patient-strip,
+    .visual-toolbar,
+    .bed-visual-footer {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .patient-bed-pill,
+    .allocation-status-actions,
+    .status-action,
+    .secondary-modal-action,
+    .primary-modal-action {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .visual-board {
+      min-height: 420px;
+    }
+
+    .allocation-error-text {
+      text-align: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bed-node.bed-status-available:not(.selected-bed)::before {
+      animation: none;
+      opacity: 0;
+    }
+  }
 }

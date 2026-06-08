@@ -6,6 +6,7 @@ import { Chat } from '../chat/chat';
 import { PatientList } from '../MD/OPD/patient-list/patient-list';
 import { PatientListForDoctor } from '../MD/OPD/patient-list-for-doctor/patient-list-for-doctor';
 import { DoctorCalendar } from '../MD/OPD/doctor-calendar/doctor-calendar';
+import { IpdAdmission } from '../MD/IPD/ipd-admission/ipd-admission';
 import { IpdManagement } from '../MD/IPD/ipd-management/ipd-management';
 import { WardManagement } from '../MD/IPD/ward-management/ward-management';
 
@@ -51,8 +52,13 @@ export const layOutRoutes: Routes = [
         component: IpdManagement,
       },
       {
+        path: 'admission',
+        component: IpdAdmission,
+      },
+      {
         path: 'patients',
-        component: IpdManagement,
+        redirectTo: 'admission',
+        pathMatch: 'full',
       },
       {
         path: 'beds',

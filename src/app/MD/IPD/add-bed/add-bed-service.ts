@@ -19,6 +19,10 @@ export class AddBedService {
     return this.http.get<any>(`${this.baseUrl}/bed/get-bed-list`);
   }
 
+  assignPatientToBed(data: { patientId: string | number; bedId: string | number; allocationStatus: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/bed/assign-patient-to-bed`, data);
+  }
+
   deleteBed(bedId: string | number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/bed/delete-bed/${encodeURIComponent(String(bedId))}`);
   }

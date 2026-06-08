@@ -1,0 +1,130 @@
+<section class="ipd-admission-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">IPD Department</p>
+      <h1>IPD Admission</h1>
+    </div>
+
+    <a class="secondary-action" routerLink="/ipd/beds">
+      <i class="fa-solid fa-bed"></i>
+      <span>Ward & Bed</span>
+    </a>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span class="summary-icon teal">
+        <i class="fa-solid fa-bed-pulse"></i>
+      </span>
+      <div>
+        <span class="summary-label">Admit Patients</span>
+        <strong>{{ totalAdmittedPatients }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-icon green">
+        <i class="fa-solid fa-calendar-check"></i>
+      </span>
+      <div>
+        <span class="summary-label">Today Admissions</span>
+        <strong>{{ todayAdmissions }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-icon red">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
+      <div>
+        <span class="summary-label">Critical</span>
+        <strong>{{ criticalPatients }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        placeholder="Search admit patient"
+        [value]="searchText"
+        (input)="setSearchText($any($event.target).value)"
+      />
+    </label>
+
+    <button type="button" class="refresh-action" [disabled]="loading" (click)="loadPatients()">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="patient-table-panel">
+    <div class="table-responsive">
+      <table class="patient-table">
+        <thead>
+          <tr>
+            <th>Sr No.</th>
+            <th>Patient</th>
+            <th>Age / Gender</th>
+            <th>Doctor</th>
+            <th>Admission Date</th>
+            <th>Visit Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Bed</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+          <tr>
+            <td colspan="10" class="empty-state">Loading admit patients...</td>
+          </tr>
+          } @else if (errorMessage) {
+          <tr>
+            <td colspan="10" class="empty-state error">{{ errorMessage }}</td>
+          </tr>
+          } @else if (filteredAdmittedPatients().length === 0) {
+          <tr>
+            <td colspan="10" class="empty-state">No admit patients found.</td>
+          </tr>
+          } @else {
+          @for (patient of filteredAdmittedPatients(); track patient.patientId || $index; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>
+              <div class="patient-profile">
+                <span [class]="getAvatarClass(i)">{{ getPatientInitials(patient) }}</span>
+                <div>
+                  <strong>{{ patient.name || 'N/A' }}</strong>
+                  <small>{{ patient.patientId || 'N/A' }}</small>
+                </div>
+              </div>
+            </td>
+            <td>{{ getAgeGender(patient) }}</td>
+            <td>{{ getDoctorName(patient) }}</td>
+            <td>{{ getAdmissionDate(patient) }}</td>
+            <td>{{ getVisitDate(patient) }}</td>
+            <td><span [class]="'priority ' + getPriorityClass(patient)">{{ getPatientPriority(patient) }}</span></td>
+            <td><span [class]="'status ' + getStatusClass(patient)">{{ getPatientStatus(patient) }}</span></td>
+            <td><span class="bed-chip">{{ getBedLabel(patient) }}</span></td>
+            <td>
+              <div class="row-actions">
+                <button type="button" aria-label="View patient" (click)="openViewPatient(patient)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+                <button type="button" aria-label="Allocate bed" (click)="openBedVisual(patient)">
+                  <i class="fa-solid fa-bed"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

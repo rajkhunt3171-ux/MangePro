@@ -1,0 +1,174 @@
+<div class="modal-header bed-visual-header">
+  <div>
+    <p class="modal-eyebrow">IPD Bed Allocation</p>
+    <h2 class="modal-title">Ward, Room & Bed Visual</h2>
+  </div>
+
+  <button type="button" class="btn-close" aria-label="Close bed visual modal" (click)="activeModal.dismiss()"></button>
+</div>
+
+<div class="modal-body bed-visual-body">
+  <div class="patient-strip">
+    <span class="patient-avatar">{{ getPatientInitials() }}</span>
+    <div class="patient-info">
+      <small>Selected Patient</small>
+      <strong>{{ getPatientName() }}</strong>
+      <span>{{ getPatientMeta() }}</span>
+    </div>
+    <span class="patient-bed-pill">
+      <i class="fa-solid fa-bed"></i>
+      {{ getPatientBedLabel() }}
+    </span>
+  </div>
+
+  <div class="visual-toolbar">
+    <div class="visual-stats" aria-label="Ward room bed totals">
+      <span><strong>{{ totalWards }}</strong> Wards</span>
+      <span><strong>{{ totalRooms }}</strong> Rooms</span>
+      <span><strong>{{ totalBeds }}</strong> Beds</span>
+    </div>
+
+    <div class="status-legend" aria-label="Bed status legend">
+      @for (status of bedStatuses; track status.key) {
+      <span [class]="'legend-item bed-status-' + status.key">
+        <i></i>
+        {{ status.label }}
+        <strong>{{ getStatusCount(status.key) }}</strong>
+      </span>
+      }
+    </div>
+  </div>
+
+  @if (loadingVisual) {
+  <p class="empty-text">Loading visual...</p>
+  } @else if (errorMessage) {
+  <p class="error-text">{{ errorMessage }}</p>
+  } @else if (visualWards.length) {
+  <div class="visual-board">
+    <ul class="visual-tree" aria-label="Ward room bed visual tree">
+      @for (ward of visualWards; track ward.id || ward.name) {
+      <li class="visual-tree-item">
+        <div class="visual-node ward-node">
+          <span><i class="fa-solid fa-hospital"></i> Ward</span>
+          <strong>{{ ward.name || ward.id || '-' }}</strong>
+          <small>{{ ward.id || '-' }}</small>
+        </div>
+
+        <ul class="visual-tree-children">
+          @if (ward.rooms.length) {
+          @for (room of ward.rooms; track room.id || room.name) {
+          <li class="visual-tree-item">
+            <div class="visual-node room-node">
+              <span><i class="fa-solid fa-door-open"></i> Room</span>
+              <strong>{{ room.name || room.id || '-' }}</strong>
+              <small>{{ room.id || '-' }}</small>
+            </div>
+
+            <ul class="visual-tree-children">
+              @if (room.beds.length) {
+              @for (bed of room.beds; track bed.id || bed.name) {
+              <li class="visual-tree-item">
+                <div
+                  class="visual-node bed-node"
+                  role="button"
+                  [class.bed-status-available]="bed.status === 'available'"
+                  [class.bed-status-occupied]="bed.status === 'occupied'"
+                  [class.bed-status-reserved]="bed.status === 'reserved'"
+                  [class.bed-status-cleaning]="bed.status === 'cleaning'"
+                  [class.bed-status-maintenance]="bed.status === 'maintenance'"
+                  [class.selected-bed]="isSelectedBed(bed)"
+                  [class.patient-bed]="isPatientBed(bed)"
+                  [class.disabled-bed]="!isBedSelectable(bed)"
+                  [attr.aria-disabled]="!isBedSelectable(bed)"
+                  [attr.aria-pressed]="isSelectedBed(bed)"
+                  [attr.tabindex]="isBedSelectable(bed) ? 0 : -1"
+                  (click)="selectBed(bed)"
+                  (keydown.enter)="selectBed(bed)"
+                  (keydown.space)="selectBed(bed); $event.preventDefault()"
+                >
+                  <span class="bed-info-icon">
+                    <i class="fa-solid fa-info"></i>
+                  </span>
+                  <span><i class="fa-solid fa-bed"></i> Bed</span>
+                  <strong>{{ bed.name || bed.id || '-' }}</strong>
+                  <small class="bed-status-chip">{{ bed.statusLabel }}</small>
+                  <div class="bed-detail-popover" role="tooltip">
+                    <div class="bed-detail-title">Bed Details</div>
+                    @for (detail of getBedDetails(bed); track detail.label) {
+                    <div class="bed-detail-row">
+                      <span>{{ detail.label }}</span>
+                      <strong>{{ detail.value }}</strong>
+                    </div>
+                    }
+                  </div>
+                </div>
+              </li>
+              }
+              } @else {
+              <li class="visual-tree-item">
+                <div class="visual-node muted-node">
+                  <span><i class="fa-solid fa-bed"></i> Bed</span>
+                  <strong>No Bed</strong>
+                </div>
+              </li>
+              }
+            </ul>
+          </li>
+          }
+          } @else {
+          <li class="visual-tree-item">
+            <div class="visual-node muted-node">
+              <span><i class="fa-solid fa-door-open"></i> Room</span>
+              <strong>No Room</strong>
+            </div>
+          </li>
+          }
+        </ul>
+      </li>
+      }
+    </ul>
+  </div>
+  } @else {
+  <p class="empty-text">No visual data.</p>
+  }
+</div>
+
+<div class="modal-footer bed-visual-footer">
+  @if (selectedBed; as bed) {
+  <div class="selected-bed-summary">
+    <span>Selected Bed</span>
+    <strong>{{ bed.name || bed.id || '-' }}</strong>
+    <small>{{ bed.statusLabel }}</small>
+  </div>
+
+  <div class="allocation-status-actions" aria-label="Bed allocation status">
+    <button
+      type="button"
+      class="status-action occupied-action"
+      [class.active]="isAllocationStatusSelected('occupied')"
+      [disabled]="assigningBed"
+      (click)="setAllocationStatus('occupied')"
+    >
+      Occupied
+    </button>
+    <button
+      type="button"
+      class="status-action reserved-action"
+      [class.active]="isAllocationStatusSelected('reserved')"
+      [disabled]="assigningBed"
+      (click)="setAllocationStatus('reserved')"
+    >
+      Reserved
+    </button>
+  </div>
+  }
+
+  @if (allocationErrorMessage) {
+  <p class="allocation-error-text">{{ allocationErrorMessage }}</p>
+  }
+
+  <button type="button" class="secondary-modal-action" (click)="activeModal.dismiss()">Close</button>
+  <button type="button" class="primary-modal-action" [disabled]="!canAllocateSelectedBed()" (click)="allocateBed(selectedBed)">
+    {{ assigningBed ? 'Saving...' : 'Done' }}
+  </button>
+</div>
