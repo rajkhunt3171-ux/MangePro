@@ -104,6 +104,57 @@ export class SideBar {
     }
   ];
 
+  managementModules = [
+    {
+      id: 1,
+      name: 'Appointment Management',
+      url: '/opd',
+      icon: 'fas fa-calendar-check'
+    },
+    {
+      id: 2,
+      name: 'Bed/Ward Management',
+      url: '/ipd/beds',
+      icon: 'fas fa-bed'
+    },
+    {
+      id: 3,
+      name: 'Billing & Invoice',
+      url: '/billing',
+      icon: 'fas fa-file-invoice-dollar'
+    },
+    {
+      id: 4,
+      name: 'Insurance Management',
+      url: '/insurance',
+      icon: 'fas fa-shield-heart'
+    },
+    {
+      id: 5,
+      name: 'Prescription Management',
+      url: '/prescriptions',
+      icon: 'fas fa-prescription-bottle-medical'
+    },
+    {
+      id: 6,
+      name: 'Medical Records',
+      url: '/medical-records',
+      icon: 'fas fa-file-medical'
+    },
+    {
+      id: 7,
+      name: 'Discharge Summary',
+      url: '/discharge-summary',
+      icon: 'fas fa-file-export'
+    },
+    {
+      id: 8,
+      name: 'Ambulance Management',
+      url: '/ambulance',
+      icon: 'fas fa-truck-medical'
+    }
+  ];
+
   constructor(
     public sharedService: SharedService
   ) { }

@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 import { AddBedService } from '../../add-bed/add-bed-service';
 import { AddRoomService } from '../../add-room/add-room-service';
 import { AddWardService } from '../../add-ward/add-ward-service';
+import { PatientListService } from '../../../OPD/patient-list/patient-list-service';
+import { PatientOtherDetailsModal } from '../patient-other-details-modal/patient-other-details-modal';
 
 interface Room {
   id?: number | string;
@@ -60,6 +62,7 @@ export class BedVisualModal implements OnInit {
   beds = signal<Bed[]>([]);
   loadingVisual = false;
   assigningBed = false;
+  dischargingPatient = false;
   errorMessage = '';
   allocationErrorMessage = '';
   selectedBedKey = '';
@@ -74,6 +77,8 @@ export class BedVisualModal implements OnInit {
     private addBedService: AddBedService,
     private addRoomService: AddRoomService,
     private addWardService: AddWardService,
+    private patientListService: PatientListService,
+    private modalService: NgbModal,
   ) { }
 
   ngOnInit() {
@@ -231,7 +236,7 @@ export class BedVisualModal implements OnInit {
   }
 
   selectBed(bed: Bed) {
-    if (!this.isBedSelectable(bed) || this.assigningBed) {
+    if (!this.isBedSelectable(bed) || this.assigningBed || this.dischargingPatient) {
       return;
     }
 
@@ -257,7 +262,7 @@ export class BedVisualModal implements OnInit {
   }
 
   canAllocateSelectedBed() {
-    return !!this.selectedBed && this.isBedSelectable(this.selectedBed) && !!this.selectedAllocationStatus && !this.assigningBed;
+    return !!this.selectedBed && this.isBedSelectable(this.selectedBed) && !!this.selectedAllocationStatus && !this.assigningBed && !this.dischargingPatient;
   }
 
   getStatusCount(status: BedStatus) {
@@ -337,10 +342,48 @@ export class BedVisualModal implements OnInit {
     return (this.patient?.patientId);
   }
 
+  openOtherDetails() {
+    const modalRef = this.modalService.open(PatientOtherDetailsModal, {
+      backdrop: 'static',
+      scrollable: true,
+      size: 'xl',
+      windowClass: 'patient-other-details-modal-window',
+    });
+
+    modalRef.componentInstance.patient = this.patient;
+  }
+
+  dischargePatient() {
+    const patientId = this.getPatientId();
+
+    if (this.dischargingPatient) {
+      return;
+    }
+
+    if (!patientId) {
+      this.allocationErrorMessage = 'Patient ID is missing.';
+      return;
+    }
+
+    this.dischargingPatient = true;
+    this.allocationErrorMessage = '';
+
+    this.patientListService.admitPatient({ patientId, idAdmitted: false, admissionDate: '' }).subscribe({
+      next: () => {
+        this.dischargingPatient = false;
+        this.activeModal.close({ action: 'discharged' });
+      },
+      error: (err) => {
+        this.dischargingPatient = false;
+        this.allocationErrorMessage = err?.error?.message || 'Unable to discharge patient.';
+      },
+    });
+  }
+
   allocateBed(item?: Bed) {
     const patientId = this.getPatientId();
 
-    if (!item || !this.selectedAllocationStatus || !patientId || !item.id || !this.isBedSelectable(item)) {
+    if (this.dischargingPatient || !item || !this.selectedAllocationStatus || !patientId || !item.id || !this.isBedSelectable(item)) {
       if (!patientId || !item?.id) {
         this.allocationErrorMessage = 'Patient ID or Bed ID is missing.';
       } else if (!this.isBedSelectable(item)) {

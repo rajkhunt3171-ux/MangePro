@@ -15,10 +15,22 @@
       <strong>{{ getPatientName() }}</strong>
       <span>{{ getPatientMeta() }}</span>
     </div>
-    <span class="patient-bed-pill">
-      <i class="fa-solid fa-bed"></i>
-      {{ getPatientBedLabel() }}
-    </span>
+    <div class="patient-bed-actions">
+      <span class="patient-bed-pill">
+        <i class="fa-solid fa-bed"></i>
+        {{ getPatientBedLabel() }}
+      </span>
+      <button type="button" class="patient-strip-action discharge-action"
+        [disabled]="assigningBed || dischargingPatient" (click)="dischargePatient()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>{{ dischargingPatient ? 'Discharging...' : 'Discharge' }}</span>
+      </button>
+      <button type="button" class="patient-strip-action details-action" [disabled]="assigningBed || dischargingPatient"
+        (click)="openOtherDetails()">
+        <i class="fa-regular fa-rectangle-list"></i>
+        <span>Other Details</span>
+      </button>
+    </div>
   </div>
 
   <div class="visual-toolbar">
@@ -68,24 +80,17 @@
               @if (room.beds.length) {
               @for (bed of room.beds; track bed.id || bed.name) {
               <li class="visual-tree-item">
-                <div
-                  class="visual-node bed-node"
-                  role="button"
+                <div class="visual-node bed-node" role="button"
                   [class.bed-status-available]="bed.status === 'available'"
                   [class.bed-status-occupied]="bed.status === 'occupied'"
                   [class.bed-status-reserved]="bed.status === 'reserved'"
                   [class.bed-status-cleaning]="bed.status === 'cleaning'"
                   [class.bed-status-maintenance]="bed.status === 'maintenance'"
-                  [class.selected-bed]="isSelectedBed(bed)"
-                  [class.patient-bed]="isPatientBed(bed)"
-                  [class.disabled-bed]="!isBedSelectable(bed)"
-                  [attr.aria-disabled]="!isBedSelectable(bed)"
-                  [attr.aria-pressed]="isSelectedBed(bed)"
-                  [attr.tabindex]="isBedSelectable(bed) ? 0 : -1"
-                  (click)="selectBed(bed)"
-                  (keydown.enter)="selectBed(bed)"
-                  (keydown.space)="selectBed(bed); $event.preventDefault()"
-                >
+                  [class.selected-bed]="isSelectedBed(bed)" [class.patient-bed]="isPatientBed(bed)"
+                  [class.disabled-bed]="!isBedSelectable(bed)" [attr.aria-disabled]="!isBedSelectable(bed)"
+                  [attr.aria-pressed]="isSelectedBed(bed)" [attr.tabindex]="isBedSelectable(bed) ? 0 : -1"
+                  (click)="selectBed(bed)" (keydown.enter)="selectBed(bed)"
+                  (keydown.space)="selectBed(bed); $event.preventDefault()">
                   <span class="bed-info-icon">
                     <i class="fa-solid fa-info"></i>
                   </span>
@@ -142,22 +147,12 @@
   </div>
 
   <div class="allocation-status-actions" aria-label="Bed allocation status">
-    <button
-      type="button"
-      class="status-action occupied-action"
-      [class.active]="isAllocationStatusSelected('occupied')"
-      [disabled]="assigningBed"
-      (click)="setAllocationStatus('occupied')"
-    >
+    <button type="button" class="status-action occupied-action" [class.active]="isAllocationStatusSelected('occupied')"
+      [disabled]="assigningBed" (click)="setAllocationStatus('occupied')">
       Occupied
     </button>
-    <button
-      type="button"
-      class="status-action reserved-action"
-      [class.active]="isAllocationStatusSelected('reserved')"
-      [disabled]="assigningBed"
-      (click)="setAllocationStatus('reserved')"
-    >
+    <button type="button" class="status-action reserved-action" [class.active]="isAllocationStatusSelected('reserved')"
+      [disabled]="assigningBed" (click)="setAllocationStatus('reserved')">
       Reserved
     </button>
   </div>
@@ -168,7 +163,8 @@
   }
 
   <button type="button" class="secondary-modal-action" (click)="activeModal.dismiss()">Close</button>
-  <button type="button" class="primary-modal-action" [disabled]="!canAllocateSelectedBed()" (click)="allocateBed(selectedBed)">
+  <button type="button" class="primary-modal-action" [disabled]="!canAllocateSelectedBed()"
+    (click)="allocateBed(selectedBed)">
     {{ assigningBed ? 'Saving...' : 'Done' }}
   </button>
 </div>

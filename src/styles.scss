@@ -25,6 +25,48 @@
   }
 }
 
+.patient-other-details-modal-window .modal-dialog {
+  max-width: min(94vw, 1180px);
+}
+
+.other-details-modal {
+  .section-heading {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .go-to-action {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--section-border);
+    border-radius: 8px;
+    color: var(--section-accent);
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-weight: 900;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px 9px;
+    white-space: nowrap;
+  }
+
+  .go-to-action:hover {
+    background: var(--section-soft);
+  }
+
+  @media (max-width: 640px) {
+    .detail-section-header {
+      flex-wrap: wrap;
+    }
+
+    .go-to-action {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
 .bed-visual-modal-window {
   .modal-dialog {
     height: calc(100vh - 24px);
@@ -130,6 +172,15 @@
     font-weight: 700;
   }
 
+  .patient-bed-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
   .patient-bed-pill,
   .visual-stats span,
   .legend-item,
@@ -150,6 +201,37 @@
     flex: 0 0 auto;
     padding: 8px 11px;
     white-space: nowrap;
+  }
+
+  .patient-strip-action {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 900;
+    gap: 6px;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+
+  .patient-strip-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+  }
+
+  .discharge-action {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+  }
+
+  .details-action {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #3730a3;
   }
 
   .visual-toolbar {
@@ -627,7 +709,14 @@
       flex-direction: column;
     }
 
+    .patient-bed-actions {
+      align-items: stretch;
+      flex-direction: column;
+      width: 100%;
+    }
+
     .patient-bed-pill,
+    .patient-strip-action,
     .allocation-status-actions,
     .status-action,
     .secondary-modal-action,

@@ -1,0 +1,86 @@
+<section class="other-details-modal">
+  <header class="modal-header other-details-header">
+    <div>
+      <p class="modal-eyebrow">IPD Patient Details</p>
+      <h2 class="modal-title">Other Details</h2>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close other details modal" (click)="activeModal.dismiss()"></button>
+  </header>
+
+  <div class="modal-body other-details-body">
+    <div class="patient-summary">
+      <span class="patient-avatar">{{ getPatientInitials() }}</span>
+      <div class="patient-summary-info">
+        <small>Selected Patient</small>
+        <strong>{{ getPatientName() }}</strong>
+        <span>{{ getPatientMeta() }}</span>
+      </div>
+      <span class="bed-badge">
+        <i class="fa-solid fa-bed"></i>
+        {{ getBedLabel() }}
+      </span>
+    </div>
+
+    <div class="details-grid">
+      @for (section of sections; track section.key) {
+      <section
+        class="detail-section"
+        [class.tone-blue]="section.tone === 'blue'"
+        [class.tone-red]="section.tone === 'red'"
+        [class.tone-green]="section.tone === 'green'"
+        [class.tone-amber]="section.tone === 'amber'"
+      >
+        <header class="detail-section-header">
+          <span class="section-icon">
+            <i [class]="section.icon"></i>
+          </span>
+          <div class="section-heading">
+            <h3>{{ section.title }}</h3>
+            <p>{{ section.subtitle }}</p>
+          </div>
+          <button type="button" class="go-to-action" (click)="goToSection(section)">
+            <span>Go To</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </header>
+
+        @if (hasSectionData(section)) {
+        @if (section.summaryFields.length) {
+        <div class="detail-field-grid">
+          @for (field of section.summaryFields; track field.label) {
+          <div class="detail-field">
+            <span>{{ field.label }}</span>
+            <strong>{{ field.value }}</strong>
+          </div>
+          }
+        </div>
+        }
+
+        @if (section.records.length) {
+        <div class="record-list">
+          @for (record of section.records; track record.title) {
+          <article class="detail-record">
+            <h4>{{ record.title }}</h4>
+            <div class="record-field-grid">
+              @for (field of record.fields; track field.label) {
+              <div class="record-field">
+                <span>{{ field.label }}</span>
+                <strong>{{ field.value }}</strong>
+              </div>
+              }
+            </div>
+          </article>
+          }
+        </div>
+        }
+        }
+      </section>
+      }
+    </div>
+  </div>
+
+  <footer class="modal-footer other-details-footer">
+    <button type="button" class="secondary-modal-action" (click)="activeModal.dismiss()">Close</button>
+  </footer>
+</section>
