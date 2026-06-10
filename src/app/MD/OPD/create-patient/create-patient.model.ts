@@ -7,16 +7,6 @@ export class createPatientReq {
   bloodGroup = '';
   address = '';
 
-  visitDate = '';
-  visitTime = '';
-  cdId = '';
-  department = '';
-  priority = '';
-
-  symptoms = '';
-  allergies = '';
-  currentMedication = '';
-
   emergencyContactName = '';
   emergencyContactRelation = '';
   emergencyContactNumber = '';

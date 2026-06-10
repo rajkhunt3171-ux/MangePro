@@ -204,6 +204,10 @@
   width: 100%;
 }
 
+.patient-basic-table {
+  min-width: 900px;
+}
+
 .patient-table thead {
   background: #f8fafc;
 }
@@ -241,7 +245,21 @@
 .patient-profile {
   align-items: center;
   display: flex;
-  gap: 12px;
+  gap: 10px;
+}
+
+.patient-profile-icon {
+  align-items: center;
+  background: #eaf3ff;
+  border-radius: 10px;
+  color: #0f172a;
+  display: inline-flex;
+  flex: 0 0 44px;
+  font-size: 15px;
+  font-weight: 800;
+  height: 34px;
+  justify-content: center;
+  width: 44px;
 }
 
 .avatar {
@@ -396,6 +414,18 @@
   color: #3730a3;
 }
 
+.row-actions button.appointment-request-action:hover {
+  background: #ecfeff;
+  border-color: #67e8f9;
+  color: #0e7490;
+}
+
+.row-actions button.appointment-request-action.requested-action {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
 .row-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
@@ -443,4 +473,5 @@
   .filters {
     padding-bottom: 2px;
   }
+
 }

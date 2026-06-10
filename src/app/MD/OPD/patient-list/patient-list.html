@@ -23,16 +23,6 @@
     </div>
 
     <div class="summary-card">
-      <div class="summary-icon teal">
-        <i class="fa-solid fa-bed-pulse"></i>
-      </div>
-      <div>
-        <span class="summary-label">Total Admit Patients</span>
-        <strong>{{ totalAdmitPatients }}</strong>
-      </div>
-    </div>
-
-    <div class="summary-card">
       <div class="summary-icon green">
         <i class="fa-solid fa-calendar-check"></i>
       </div>
@@ -41,108 +31,65 @@
         <strong>{{ todayVisits }}</strong>
       </div>
     </div>
-
-    <div class="summary-card">
-      <div class="summary-icon amber">
-        <i class="fa-solid fa-clock"></i>
-      </div>
-      <div>
-        <span class="summary-label">Waiting</span>
-        <strong>{{ waitingPatients }}</strong>
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-icon orange">
-        <i class="fa-solid fa-bolt"></i>
-      </div>
-      <div>
-        <span class="summary-label">Urgent</span>
-        <strong>{{ urgentPatients }}</strong>
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-icon red">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <div>
-        <span class="summary-label">Critical</span>
-        <strong>{{ criticalPatients }}</strong>
-      </div>
-    </div>
   </div>
 
   <div class="toolbar">
     <label class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Search patient" [value]="searchText" (input)="setSearchText($any($event.target).value)" />
+      <input type="text" placeholder="Search patient" [value]="searchText()" (input)="setSearchText($any($event.target).value)" />
     </label>
 
     <div class="filters">
-      <button type="button" class="filter" [class.active]="statusFilter === 'All'" (click)="setStatusFilter('All')">All</button>
-      <button type="button" class="filter" [class.active]="statusFilter === 'Waiting'" (click)="setStatusFilter('Waiting')">Waiting</button>
-      <button type="button" class="filter" [class.active]="statusFilter === 'Consulted'" (click)="setStatusFilter('Consulted')">Consulted</button>
+      <button type="button" class="filter" [class.active]="dateFilter() === 'All'" (click)="setDateFilter('All')">All</button>
+      <button type="button" class="filter" [class.active]="dateFilter() === 'Today'" (click)="setDateFilter('Today')">Today</button>
     </div>
   </div>
 
   <div class="patient-table-panel">
     <div class="table-responsive">
-      <table class="patient-table">
+      <table class="patient-table patient-basic-table">
         <thead>
           <tr>
-            <th>View</th>
-            <th>OPD No.</th>
+            <th>No.</th>
+            <th>Created At</th>
             <th>Patient</th>
+            <th>Mobile Number</th>
             <th>Age / Gender</th>
-            <th>Doctor</th>
-            <th>Visit Date</th>
-            <th>Visit Time</th>
-            <th>Priority</th>
-            <th>Status</th>
-            <th>Admit</th>
             <th class="text-end">Action</th>
           </tr>
         </thead>
         <tbody>
+          @let visiblePatients = filteredPatients();
           @if (loading) {
           <tr>
-            <td colspan="11" class="empty-state">Loading patients...</td>
+            <td colspan="6" class="empty-state">Loading patients...</td>
           </tr>
           } @else if (errorMessage) {
           <tr>
-            <td colspan="11" class="empty-state error">{{ errorMessage }}</td>
+            <td colspan="6" class="empty-state error">{{ errorMessage }}</td>
           </tr>
-          } @else if (filteredPatients().length === 0) {
+          } @else if (visiblePatients.length === 0) {
           <tr>
-            <td colspan="11" class="empty-state">No patients found.</td>
+            <td colspan="6" class="empty-state">No patients found.</td>
           </tr>
           } @else {
-          @for (patient of filteredPatients(); track $index; let i = $index) {
+          @for (patient of visiblePatients; track patient.patientId || patient._id || patient.id || $index; let i = $index) {
           <tr>
-            <td>
-              <div class="row-actions view-actions">
-                <button type="button" aria-label="View patient" (click)="openViewPatient(patient)">
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-              </div>
-            </td>
-            <td>{{ patient.patientId || 'N/A' }}</td>
+            <td>{{ i + 1 }}</td>
+            <td>{{ getCreatedDateTime(patient) }}</td>
             <td>
               <div class="patient-profile">
-                <span [class]="getAvatarClass(i)">{{ getPatientInitials(patient) }}</span>
+                <span class="patient-profile-icon">
+                  {{ getPatientInitials(patient) }}
+                </span>
                 <div>
                   <strong>{{ patient.name || 'N/A' }}</strong>
+                  <small>{{ patient.patientId || 'N/A' }}</small>
                 </div>
               </div>
             </td>
+            <td>{{ getMobileNumber(patient) }}</td>
             <td>{{ getAgeGender(patient) }}</td>
-            <td>{{ patient.cdId || 'N/A' }}</td>
-            <td>{{ getVisitDate(patient) }}</td>
-            <td>{{ getVisitTime(patient) }}</td>
-            <td><span [class]="'priority ' + (patient.priority || 'Normal').toLowerCase()">{{ patient.priority || 'Normal' }}</span></td>
-            <td><span [class]="'status ' + getStatusClass(patient)">{{ getPatientStatus(patient) }}</span></td>
-            <td><span [class]="'admit-status ' + getAdmitStatusClass(patient)">{{ getAdmitStatusLabel(patient) }}</span></td>
             <td>
               <div class="row-actions">
                 <button type="button" aria-label="Edit patient">
@@ -155,6 +102,15 @@
                   (click)="openDeletePatient(patient)">
                   <i class="fa-regular fa-trash-can"></i>
                 </button>
+                <button
+                  type="button"
+                  class="appointment-request-action"
+                  [class.requested-action]="isAppointmentRequested(patient)"
+                  aria-label="Request to appointment"
+                  [disabled]="isAppointmentRequesting(patient) || isAppointmentRequested(patient)"
+                  (click)="requestToAppointment(patient)">
+                  <i [class]="getAppointmentRequestIcon(patient)"></i>
+                </button>
               </div>
             </td>
           </tr>
@@ -164,4 +120,5 @@
       </table>
     </div>
   </div>
+
 </section>

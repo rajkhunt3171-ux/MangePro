@@ -95,6 +95,8 @@ export class AppointmentManage implements OnInit {
         appointment?.cdId,
         appointment?.doctorName,
         appointment?.doctor?.name,
+        appointment?.dateandtime,
+        appointment?.dateAndTime,
       ].filter(Boolean).join(' ').toLowerCase();
 
       return statusMatches && searchableText.includes(search);
@@ -133,7 +135,7 @@ export class AppointmentManage implements OnInit {
   }
 
   getAppointmentDate(appointment: any) {
-    const value = appointment?.appointmentDate || appointment?.visitDate;
+    const value = this.getAppointmentDateValue(appointment);
     if (!value) {
       return 'N/A';
     }
@@ -143,9 +145,17 @@ export class AppointmentManage implements OnInit {
   }
 
   getAppointmentTime(appointment: any) {
-    const value = appointment?.appointmentTime || appointment?.visitTime;
+    const value = this.getAppointmentTimeValue(appointment);
     if (!value) {
       return 'N/A';
+    }
+
+    const combinedDateTimeMatch = String(value).trim().match(/^\d{4}-\d{2}-\d{2}\s+(\d{2}:\d{2})/);
+    if (combinedDateTimeMatch) {
+      return new Date(`2000-01-01T${combinedDateTimeMatch[1]}`).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     }
 
     if (/^\d{2}:\d{2}/.test(String(value))) {
@@ -233,7 +243,7 @@ export class AppointmentManage implements OnInit {
 
   isTodayVisit(appointment: any) {
     const todayKey = this.getTodayDateKey();
-    const visitDateKey = this.getDateKey(appointment?.appointmentDate || appointment?.visitDate);
+    const visitDateKey = this.getDateKey(this.getAppointmentDateValue(appointment));
 
     return visitDateKey === todayKey;
   }
@@ -314,6 +324,30 @@ export class AppointmentManage implements OnInit {
         this.appointments.update((appointments) => appointments.filter((item) => item.patientId !== patientId));
       }
     }).catch(() => { });
+  }
+
+  private getAppointmentDateValue(appointment: any) {
+    return (
+      appointment?.appointmentDate ||
+      appointment?.date ||
+      appointment?.dateandtime ||
+      appointment?.dateAndTime ||
+      appointment?.appointmentDateTime ||
+      appointment?.visitDate ||
+      appointment?.createdAt
+    );
+  }
+
+  private getAppointmentTimeValue(appointment: any) {
+    return (
+      appointment?.appointmentTime ||
+      appointment?.time ||
+      appointment?.dateandtime ||
+      appointment?.dateAndTime ||
+      appointment?.appointmentDateTime ||
+      appointment?.visitTime ||
+      appointment?.createdAt
+    );
   }
 
   private toTitleStatus(value: any) {

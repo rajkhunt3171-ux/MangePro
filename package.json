@@ -11,6 +11,7 @@
   "private": true,
   "packageManager": "npm@10.9.4",
   "dependencies": {
+    "@angular/animations": "^21.2.13",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
@@ -20,6 +21,7 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "bootstrap": "^5.3.8",
+    "ngx-toastr": "^19.1.0",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.8.3",
     "tslib": "^2.3.0"

@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastService } from '../../../shared/service/toast-service';
 import { CreatePatient } from '../create-patient/create-patient';
 import { DeletePatientModal } from './delete-patient-modal/delete-patient-modal';
 import { PatientListService } from './patient-list-service';
-import { ViewPatientModal } from './view-patient-modal/view-patient-modal';
 
 @Component({
   selector: 'app-patient-list',
@@ -14,12 +14,36 @@ export class PatientList implements OnInit {
   patients = signal<any[]>([]);
   loading = false;
   errorMessage = '';
-  searchText = '';
-  statusFilter = 'All';
+  searchText = signal('');
+  dateFilter = signal('All');
+  appointmentRequestingPatientId: string | number | null = null;
+  appointmentRequestedPatientIds = new Set<string | number>();
+  private todayDateKey = this.formatDateKey(new Date());
+  filteredPatients = computed(() => {
+    const search = this.searchText().trim().toLowerCase();
+    const dateFilter = this.dateFilter();
+
+    return this.patients().filter((patient) => {
+      const dateMatches = dateFilter === 'All' || this.isTodayVisit(patient);
+      if (!search) {
+        return dateMatches;
+      }
+      const searchableText = [
+        patient?.patientId,
+        patient?.name,
+        patient?.number,
+        patient?.mobileNumber,
+        patient?.mobile,
+        patient?.phone,
+      ].filter(Boolean).join(' ').toLowerCase();
+      return dateMatches && searchableText.includes(search);
+    });
+  });
 
   constructor(
     private modalService: NgbModal,
     private patientListService: PatientListService,
+    private toastService: ToastService,
   ) { }
 
   ngOnInit() {
@@ -48,88 +72,30 @@ export class PatientList implements OnInit {
     return this.patients().length;
   }
 
-  get totalAdmitPatients() {
-    return this.patients().filter((patient) => this.isPatientAdmitted(patient)).length;
-  }
-
   get todayVisits() {
     return this.patients().filter((patient) => this.isTodayVisit(patient)).length;
   }
 
   isTodayVisit(patient: any) {
-    const todayKey = this.getTodayDateKey();
-    const visitDateKey = this.getDateKey(patient?.visitDate);
+    const visitDateKey = this.getDateKey(this.getCreatedAtValue(patient) || patient?.visitDate);
 
-    return visitDateKey === todayKey;
-  }
-
-  get waitingPatients() {
-    return this.patients().filter((patient) => this.getPatientStatus(patient) === 'Waiting').length;
-  }
-
-  getPatientStatus(patient: any) {
-    if (patient?.status) {
-      return this.toTitleStatus(patient.status);
-    }
-    return 'Waiting';
-  }
-
-  toTitleStatus(value: any) {
-    const status = String(value || '').trim().toLowerCase();
-    if (status === 'checked-in' || status === 'checked in') {
-      return 'Checked In';
-    }
-    if (status === 'consulted') {
-      return 'Consulted';
-    }
-    if (status === 'completed') {
-      return 'Completed';
-    }
-    return 'Waiting';
-  }
-
-  get urgentPatients() {
-    return this.patients().filter((patient) => this.getPatientPriority(patient) === 'Urgent').length;
-  }
-
-  get criticalPatients() {
-    return this.patients().filter((patient) => this.getPatientPriority(patient) === 'Critical').length;
-  }
-
-  private getPatientPriority(patient: any) {
-    const priority = String(patient?.priority || '').trim().toLowerCase();
-    if (priority === 'critical') {
-      return 'Critical';
-    }
-    if (priority === 'urgent') {
-      return 'Urgent';
-    }
-    return 'Normal';
+    return visitDateKey === this.todayDateKey;
   }
 
   setSearchText(value: string) {
-    this.searchText = value;
+    this.searchText.set(value);
   }
 
-  setStatusFilter(status: string) {
-    this.statusFilter = status;
+  setDateFilter(filter: string) {
+    this.dateFilter.set(filter);
   }
 
-  filteredPatients() {
-    const search = this.searchText.trim().toLowerCase();
-
-    return this.patients().filter((patient) => {
-      const statusMatches = this.statusFilter === 'All' || this.getPatientStatus(patient) === this.statusFilter;
-      if (!search) {
-        return statusMatches;
-      }
-      const searchableText = String(patient?.name || '').toLowerCase();
-      return statusMatches && searchableText.includes(search);
-    });
+  getMobileNumber(patient: any) {
+    return patient?.number || patient?.mobileNumber || patient?.mobile || patient?.phone || 'N/A';
   }
 
   getPatientInitials(patient: any) {
-    const name = patient?.name || '';
+    const name = String(patient?.name || '').trim();
     const initials = name
       .split(' ')
       .filter(Boolean)
@@ -137,12 +103,8 @@ export class PatientList implements OnInit {
       .join('')
       .slice(0, 2)
       .toUpperCase();
-    return initials || 'NA';
-  }
 
-  getAvatarClass(index: number) {
-    const classes = ['avatar', 'avatar soft-green', 'avatar soft-amber', 'avatar soft-purple', 'avatar soft-red'];
-    return classes[index % classes.length];
+    return initials || 'NA';
   }
 
   getAgeGender(patient: any) {
@@ -151,85 +113,25 @@ export class PatientList implements OnInit {
     return `${age} / ${gender}`;
   }
 
-  getVisitDate(patient: any) {
-    const value = patient?.visitDate;
+  getCreatedDateTime(patient: any) {
+    const value = this.getCreatedAtValue(patient);
     if (!value) {
       return 'N/A';
     }
-    const dateKey = this.getDateKey(value);
-    return dateKey ? this.formatDateForDisplay(dateKey) : value;
-  }
 
-  getVisitTime(patient: any) {
-    const value = patient?.visitTime;
-    if (!value) {
-      return 'N/A';
-    }
-    if (/^\d{2}:\d{2}/.test(String(value))) {
-      return new Date(`2000-01-01T${value}`).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
-    const date = new Date(value);
+    const dateKey = this.getDateKey(value);
+    const date = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return value;
+      return dateKey ? this.formatDateForDisplay(dateKey) : 'N/A';
     }
-    return date.toLocaleTimeString('en-US', {
+
+    const displayDate = dateKey ? this.formatDateForDisplay(dateKey) : 'N/A';
+    const displayTime = date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
     });
-  }
 
-  getStatusClass(patient: any) {
-    return this.getPatientStatus(patient).toLowerCase().replace(/\s+/g, '-');
-  }
-
-  isPatientAdmitted(patient: any) {
-    const admittedValue =
-      patient?.idAdmitted ??
-      patient?.isAdmitted ??
-      patient?.admitted ??
-      patient?.is_admitted ??
-      patient?.admission?.idAdmitted;
-
-    if (typeof admittedValue === 'boolean') {
-      return admittedValue;
-    }
-
-    const normalizedValue = String(admittedValue ?? '').trim().toLowerCase();
-
-    return (
-      normalizedValue === 'true' ||
-      normalizedValue === '1' ||
-      normalizedValue === 'yes' ||
-      normalizedValue === 'admitted' ||
-      !!patient?.admissionDate ||
-      !!patient?.admission?.admissionDate
-    );
-  }
-
-  getAdmitStatusLabel(patient: any) {
-    return this.isPatientAdmitted(patient) ? 'Admitted' : 'Not Admit';
-  }
-
-  getAdmitStatusClass(patient: any) {
-    return this.isPatientAdmitted(patient) ? 'admitted' : 'not-admitted';
-  }
-
-  updatePatientStatus(patient: any) {
-    const patientId = patient?.patientId;
-
-    this.patients.update((patients) =>
-      patients.map((item) => {
-        const isCurrentPatient = patientId ? item?.patientId === patientId : item === patient;
-        return isCurrentPatient ? { ...item, status: patient?.status } : item;
-      })
-    );
-  }
-
-  getTodayDateKey() {
-    return this.formatDateKey(new Date());
+    return `${displayDate} ${displayTime}`;
   }
 
   getDateKey(value: any) {
@@ -274,23 +176,6 @@ export class PatientList implements OnInit {
     modalRef.result.then(() => this.loadPatients()).catch(() => { });
   }
 
-  openViewPatient(patient: any) {
-    const modalRef = this.modalService.open(ViewPatientModal, {
-      backdrop: 'static',
-      scrollable: true,
-      size: 'xl',
-    });
-
-    modalRef.componentInstance.patient = patient;
-    modalRef.componentInstance.onStatusChange = (selectedPatient: any) => this.updatePatientStatus(selectedPatient);
-
-    modalRef.result.then((updatedPatient) => {
-      if (updatedPatient) {
-        this.loadPatients();
-      }
-    }).catch(() => { });
-  }
-
   openDeletePatient(patient: any) {
     const modalRef = this.modalService.open(DeletePatientModal, {
       backdrop: 'static',
@@ -304,5 +189,76 @@ export class PatientList implements OnInit {
         this.patients.update((patients) => patients.filter((item) => item.patientId !== patientId));
       }
     }).catch(() => { });
+  }
+
+  requestToAppointment(patient: any) {
+    const patientId = patient?.patientId;
+
+    if (!patientId) {
+      this.toastService.showToastr('Patient ID missing che.', 'error');
+      return;
+    }
+
+    if (this.isAppointmentRequesting(patient) || this.isAppointmentRequested(patient)) {
+      return;
+    }
+
+    this.appointmentRequestingPatientId = patientId;
+
+    const payload = {
+      patientId,
+      dateandtime: this.getDateTimeForRequest(),
+    };
+
+    this.patientListService.requestToAppointment(payload).subscribe({
+      next: (res) => {
+        this.appointmentRequestingPatientId = null;
+
+        if (res?.success === false) {
+          this.toastService.showToastr(res?.message || 'Appointment request failed.', 'error');
+          return;
+        }
+
+        const requestedIds = new Set(this.appointmentRequestedPatientIds);
+        requestedIds.add(patientId);
+        this.appointmentRequestedPatientIds = requestedIds;
+        this.toastService.showToastr(res?.message || 'Appointment request mokli didhi.', 'success');
+        this.loadPatients();
+      },
+      error: (err) => {
+        this.appointmentRequestingPatientId = null;
+        this.toastService.showToastr(err?.error?.message || 'Appointment request karvama error aavyo.', 'error');
+      },
+    });
+  }
+
+  isAppointmentRequesting(patient: any) {
+    return this.appointmentRequestingPatientId === patient?.patientId;
+  }
+
+  isAppointmentRequested(patient: any) {
+    const patientId = patient?.patientId;
+    return !!patientId && this.appointmentRequestedPatientIds.has(patientId);
+  }
+
+  getAppointmentRequestIcon(patient: any) {
+    if (this.isAppointmentRequesting(patient)) {
+      return 'fa-solid fa-spinner fa-spin';
+    }
+    if (this.isAppointmentRequested(patient)) {
+      return 'fa-solid fa-check';
+    }
+    return 'fa-regular fa-calendar-plus';
+  }
+
+  private getCreatedAtValue(patient: any) {
+    return patient?.createdAt || patient?.created_at || patient?.createdDate || patient?.createdOn || patient?.created_on || '';
+  }
+
+  private getDateTimeForRequest(date = new Date()) {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${this.formatDateKey(date)} ${hours}:${minutes}`;
   }
 }

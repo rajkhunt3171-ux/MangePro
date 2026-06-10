@@ -25,20 +25,6 @@ export class CreatePatient implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.doctorList();
-  }
-
-  doctorList() {
-    this.createPatientService.getDoctors().subscribe({
-      next: (res) => {
-        this.doctors.set(res?.doctorList || []);
-        this.setDepartmentFromDoctor(this.createPatientReq.cdId);
-      },
-      error: (err) => {
-        console.error('Error loading doctors', err);
-        this.doctors.set([]);
-      },
-    });
   }
 
   closeModal() {
@@ -66,34 +52,5 @@ export class CreatePatient implements OnInit {
         this.errorMessage = err;
       },
     });
-  }
-
-  setDepartmentFromDoctor(doctorId: string) {
-    this.selectedDoctor = this.doctors().find(
-      (doctor) => String(this.getDoctorId(doctor)) === String(doctorId),
-    );
-    this.createPatientReq.department = this.selectedDoctor?.specification || '';
-  }
-
-  getDoctorId(doctor: any) {
-    return doctor?.cdId || doctor?.id || doctor?._id || '';
-  }
-
-  get selectedDoctorTypeLabel() {
-    const type = Number(this.selectedDoctor?.type);
-
-    if (type === 1) {
-      return 'Regular';
-    }
-
-    if (type === 2) {
-      return 'Visiter';
-    }
-
-    return '';
-  }
-
-  get selectedDoctorTypeClass() {
-    return Number(this.selectedDoctor?.type) === 2 ? 'visiter' : 'regular';
   }
 }
