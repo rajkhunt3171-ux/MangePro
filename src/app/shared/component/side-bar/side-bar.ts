@@ -108,7 +108,7 @@ export class SideBar {
     {
       id: 1,
       name: 'Appointment Management',
-      url: '/opd',
+      url: '/appointment-manage',
       icon: 'fas fa-calendar-check'
     },
     {

@@ -1,0 +1,170 @@
+<section class="patient-list-page appointment-manage-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Management Module</p>
+      <h1>Appointment Management</h1>
+    </div>
+
+    <button type="button" class="primary-action" (click)="openCreateAppointment()">
+      <i class="fa-solid fa-plus"></i>
+      <span>New Appointment</span>
+    </button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon blue">
+        <i class="fa-regular fa-calendar-days"></i>
+      </div>
+      <div>
+        <span class="summary-label">Total Appointments</span>
+        <strong>{{ totalAppointments }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon green">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div>
+        <span class="summary-label">Today Appointments</span>
+        <strong>{{ todayAppointments }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon amber">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <div>
+        <span class="summary-label">Waiting</span>
+        <strong>{{ waitingAppointments }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon teal">
+        <i class="fa-solid fa-user-check"></i>
+      </div>
+      <div>
+        <span class="summary-label">Checked In</span>
+        <strong>{{ checkedInAppointments }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon orange">
+        <i class="fa-solid fa-stethoscope"></i>
+      </div>
+      <div>
+        <span class="summary-label">Consulted</span>
+        <strong>{{ consultedAppointments }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon red">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <span class="summary-label">Completed</span>
+        <strong>{{ completedAppointments }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Search appointment" [value]="searchText" (input)="setSearchText($any($event.target).value)" />
+    </label>
+
+    <div class="filters">
+      <button type="button" class="filter" [class.active]="statusFilter === 'All'" (click)="setStatusFilter('All')">All</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Waiting'" (click)="setStatusFilter('Waiting')">Waiting</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Checked In'" (click)="setStatusFilter('Checked In')">Checked In</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Consulted'" (click)="setStatusFilter('Consulted')">Consulted</button>
+      <button type="button" class="filter" [class.active]="statusFilter === 'Completed'" (click)="setStatusFilter('Completed')">Completed</button>
+    </div>
+  </div>
+
+  <div class="patient-table-panel">
+    <div class="table-responsive">
+      <table class="patient-table appointment-table">
+        <thead>
+          <tr>
+            <th>View</th>
+            <th>Appointment No.</th>
+            <th>Patient</th>
+            <th>Age / Gender</th>
+            <th>Doctor</th>
+            <th>Appointment Date</th>
+            <th>Appointment Time</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Admit</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+          <tr>
+            <td colspan="11" class="empty-state">Loading appointments...</td>
+          </tr>
+          } @else if (errorMessage) {
+          <tr>
+            <td colspan="11" class="empty-state error">{{ errorMessage }}</td>
+          </tr>
+          } @else if (filteredAppointments().length === 0) {
+          <tr>
+            <td colspan="11" class="empty-state">No appointments found.</td>
+          </tr>
+          } @else {
+          @for (appointment of filteredAppointments(); track $index; let i = $index) {
+          <tr>
+            <td>
+              <div class="row-actions view-actions">
+                <button type="button" aria-label="View appointment" (click)="openViewAppointment(appointment)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </td>
+            <td>{{ getAppointmentId(appointment) }}</td>
+            <td>
+              <div class="patient-profile">
+                <span [class]="getAvatarClass(i)">{{ getPatientInitials(appointment) }}</span>
+                <div>
+                  <strong>{{ appointment.name || 'N/A' }}</strong>
+                  <small>{{ appointment.number || 'N/A' }}</small>
+                </div>
+              </div>
+            </td>
+            <td>{{ getAgeGender(appointment) }}</td>
+            <td>{{ getDoctorName(appointment) }}</td>
+            <td>{{ getAppointmentDate(appointment) }}</td>
+            <td>{{ getAppointmentTime(appointment) }}</td>
+            <td><span [class]="'priority ' + getAppointmentPriority(appointment).toLowerCase()">{{ getAppointmentPriority(appointment) }}</span></td>
+            <td><span [class]="'status ' + getStatusClass(appointment)">{{ getAppointmentStatus(appointment) }}</span></td>
+            <td><span [class]="'admit-status ' + getAdmitStatusClass(appointment)">{{ getAdmitStatusLabel(appointment) }}</span></td>
+            <td>
+              <div class="row-actions">
+                <button type="button" aria-label="Edit appointment">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button
+                  type="button"
+                  class="danger-action"
+                  aria-label="Delete appointment"
+                  (click)="openDeleteAppointment(appointment)">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
