@@ -11,7 +11,7 @@ export class AddBedService {
 
   constructor(private http: HttpClient) { }
 
-  createBed(data: { wardId: string | number; roomId: string | number; name: string }): Observable<any> {
+  createBed(data: { wardId: string | number; roomId: string | number; name: string; charge: number; status?: string }): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/bed/create-bed`, data);
   }
 

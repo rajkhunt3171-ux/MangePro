@@ -9,6 +9,7 @@ import { DoctorCalendar } from '../MD/OPD/doctor-calendar/doctor-calendar';
 import { IpdAdmission } from '../MD/IPD/ipd-admission/ipd-admission';
 import { IpdManagement } from '../MD/IPD/ipd-management/ipd-management';
 import { WardManagement } from '../MD/IPD/ward-management/ward-management';
+import { BillingInvoice } from '../MM/billing-invoice/billing-invoice';
 
 export const layOutRoutes: Routes = [
   {
@@ -66,4 +67,8 @@ export const layOutRoutes: Routes = [
       }
     ],
   },
+  {
+    path: 'billing',
+    component: BillingInvoice
+  }
 ];

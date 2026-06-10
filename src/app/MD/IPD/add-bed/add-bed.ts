@@ -27,6 +27,7 @@ export class AddBed {
   wardId: string | number | null = null;
   roomId: string | number | null = null;
   bedName = '';
+  charge = 0;
   saving = false;
   errorMessage = '';
 
@@ -43,8 +44,9 @@ export class AddBed {
 
   submitBed() {
     const name = this.bedName.trim();
+    const charge = Number(this.charge || 0);
 
-    if (!this.wardId || !this.roomId || !name) {
+    if (!this.wardId || !this.roomId || !name || charge < 0) {
       return;
     }
 
@@ -52,6 +54,7 @@ export class AddBed {
       roomId: this.roomId,
       wardId: this.wardId,
       name,
+      charge,
       status: 'available'
     };
 

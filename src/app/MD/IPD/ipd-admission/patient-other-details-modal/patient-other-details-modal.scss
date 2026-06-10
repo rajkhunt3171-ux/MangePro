@@ -172,63 +172,6 @@
   margin: 3px 0 0;
 }
 
-.detail-field-grid,
-.record-field-grid {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: 1fr;
-}
-
-.detail-field,
-.record-field {
-  background: #ffffff;
-  border: 1px solid var(--section-border);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-  padding: 9px 10px;
-}
-
-.detail-field span,
-.record-field span {
-  color: var(--section-accent);
-  font-size: 11px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.detail-field strong,
-.record-field strong {
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.record-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.detail-record {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid var(--section-border);
-  border-radius: 8px;
-  padding: 10px;
-}
-
-.detail-record h4 {
-  color: #334155;
-  font-size: 13px;
-  font-weight: 900;
-  margin: 0 0 8px;
-  overflow-wrap: anywhere;
-}
-
 .other-details-footer {
   border-top: 1px solid #e5e7eb;
   padding: 10px 16px;

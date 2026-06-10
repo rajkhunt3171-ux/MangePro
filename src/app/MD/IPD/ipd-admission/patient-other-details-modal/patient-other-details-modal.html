@@ -13,12 +13,12 @@
       <span class="patient-avatar">{{ getPatientInitials() }}</span>
       <div class="patient-summary-info">
         <small>Selected Patient</small>
-        <strong>{{ getPatientName() }}</strong>
+        <strong>{{ patient?.name || 'N/A' }}</strong>
         <span>{{ getPatientMeta() }}</span>
       </div>
       <span class="bed-badge">
         <i class="fa-solid fa-bed"></i>
-        {{ getBedLabel() }}
+        {{ patient?.bedId || 'Not allocated' }}
       </span>
     </div>
 
@@ -45,36 +45,6 @@
           </button>
         </header>
 
-        @if (hasSectionData(section)) {
-        @if (section.summaryFields.length) {
-        <div class="detail-field-grid">
-          @for (field of section.summaryFields; track field.label) {
-          <div class="detail-field">
-            <span>{{ field.label }}</span>
-            <strong>{{ field.value }}</strong>
-          </div>
-          }
-        </div>
-        }
-
-        @if (section.records.length) {
-        <div class="record-list">
-          @for (record of section.records; track record.title) {
-          <article class="detail-record">
-            <h4>{{ record.title }}</h4>
-            <div class="record-field-grid">
-              @for (field of record.fields; track field.label) {
-              <div class="record-field">
-                <span>{{ field.label }}</span>
-                <strong>{{ field.value }}</strong>
-              </div>
-              }
-            </div>
-          </article>
-          }
-        </div>
-        }
-        }
       </section>
       }
     </div>

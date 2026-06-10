@@ -34,6 +34,7 @@ interface Bed {
   name?: string;
   status: BedStatus;
   statusLabel: string;
+  charge: number;
   patientId?: string | number;
 }
 
@@ -180,6 +181,7 @@ export class BedVisualModal implements OnInit {
         name: bed?.name || bed?.bedName || '',
         status: this.getBedStatus(this.getRawBedStatus(bed)),
         statusLabel: '',
+        charge: this.getBedCharge(bed),
         patientId: bed?.patientId || bed?.patientID || assignedPatient?.patientId || assignedPatient?.id || assignedPatient?._id,
       };
 
@@ -309,6 +311,7 @@ export class BedVisualModal implements OnInit {
       { label: 'Bed ID', value: bed.id || '-' },
       { label: 'Ward ID', value: bed.wardId || '-' },
       { label: 'Room ID', value: bed.roomId || '-' },
+      { label: 'Charge', value: bed.charge },
       { label: 'Status', value: bed.statusLabel },
     ];
     return details;
@@ -340,6 +343,12 @@ export class BedVisualModal implements OnInit {
 
   private getPatientId() {
     return (this.patient?.patientId);
+  }
+
+  private getBedCharge(bed: any) {
+    const charge = Number(bed?.charge ?? bed?.bedCharge ?? bed?.charges ?? 0);
+
+    return Number.isFinite(charge) && charge >= 0 ? charge : 0;
   }
 
   openOtherDetails() {

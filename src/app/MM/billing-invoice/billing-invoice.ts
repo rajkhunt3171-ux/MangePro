@@ -6,4 +6,8 @@ import { Component } from '@angular/core';
   templateUrl: './billing-invoice.html',
   styleUrl: './billing-invoice.scss',
 })
-export class BillingInvoice {}
+export class BillingInvoice {
+  constructor() { }
+
+  ngOnInit(): void { }
+}

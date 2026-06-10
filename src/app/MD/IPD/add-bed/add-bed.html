@@ -41,6 +41,18 @@
       >
     </label>
 
+    <label class="form-field">
+      <span>Charge</span>
+      <input
+        type="number"
+        name="charge"
+        placeholder="Enter bed charge"
+        min="0"
+        required
+        [(ngModel)]="charge"
+      >
+    </label>
+
     @if (errorMessage) {
     <div class="save-error">
       {{ errorMessage }}
@@ -50,7 +62,7 @@
 
   <footer class="modal-footer modal-actions">
     <button type="button" class="btn btn-light" [disabled]="saving" (click)="closeModal()">Cancel</button>
-    <button type="submit" class="btn btn-primary" [disabled]="bedForm.invalid || !bedName.trim() || !wardId || !roomId || saving">
+    <button type="submit" class="btn btn-primary" [disabled]="bedForm.invalid || !bedName.trim() || !wardId || !roomId || charge < 0 || saving">
       @if (saving) {
       Saving...
       } @else {

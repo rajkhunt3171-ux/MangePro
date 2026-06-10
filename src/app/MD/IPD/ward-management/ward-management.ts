@@ -37,6 +37,7 @@ interface Bed {
   statusLabel: string;
   statusClass: string;
   type?: string;
+  charge: number;
   patient?: any;
   patientId?: string | number;
   patientName?: string;
@@ -353,6 +354,7 @@ export class WardManagement implements OnInit {
         statusLabel: '',
         statusClass: '',
         type: bed?.type || bed?.bedType,
+        charge: this.getBedCharge(bed),
         patient,
         patientId: bed?.patientId || bed?.patientID || patient?.patientId || patient?.id || patient?._id,
         patientName: bed?.patientName || patient?.name,
@@ -372,6 +374,7 @@ export class WardManagement implements OnInit {
       { label: 'Bed ID', value: bed.id || '-' },
       { label: 'Ward ID', value: bed.wardId || '-' },
       { label: 'Room ID', value: bed.roomId || '-' },
+      { label: 'Charge', value: bed.charge },
     ];
 
     details.push({ label: 'Status', value: bed.statusLabel });
@@ -425,7 +428,14 @@ export class WardManagement implements OnInit {
       bedStatus: bed.statusLabel,
       wardId: bed.wardId || 'N/A',
       roomId: bed.roomId || 'N/A',
+      bedCharge: bed.charge,
     };
+  }
+
+  private getBedCharge(bed: any) {
+    const charge = Number(bed?.charge ?? bed?.bedCharge ?? bed?.charges ?? 0);
+
+    return Number.isFinite(charge) && charge >= 0 ? charge : 0;
   }
 
   private getWardIdByRoomId(roomId: any) {
