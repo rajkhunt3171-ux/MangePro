@@ -1,0 +1,29 @@
+@use "../../MD/OPD/patient-list/patient-list.scss";
+
+.appointment-request-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.appointment-request-table {
+  min-width: 1120px;
+}
+
+.appointment-request-table th:nth-child(2),
+.appointment-request-table td:nth-child(2) {
+  text-align: center;
+}
+
+.appointment-request-table .row-actions {
+  justify-content: center;
+}
+
+.row-actions button.approve-action:hover {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+@media (max-width: 768px) {
+  .appointment-request-summary {
+    grid-template-columns: 1fr;
+  }
+}

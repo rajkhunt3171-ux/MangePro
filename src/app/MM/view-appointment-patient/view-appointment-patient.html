@@ -1,0 +1,213 @@
+<section class="view-patient-page">
+  <header class="modal-header page-header">
+    <div>
+      <p class="eyebrow">OPD Department</p>
+      <h1>Patient Details</h1>
+    </div>
+
+    <button type="button" class="btn-close" aria-label="Close patient details modal"
+      (click)="activeModal.dismiss()"></button>
+  </header>
+
+  <div class="modal-body patient-modal-body">
+    <div class="patient-form">
+      
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon blue">
+            <i class="fa-regular fa-user"></i>
+          </span>
+          <h2>Patient Details</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Patient ID</span>
+            <div class="readonly-value">{{ request?.patientId || patient?.patientId || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Full Name</span>
+            <div class="readonly-value">{{ patient?.name || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Mobile Number</span>
+            <div class="readonly-value">{{ patient?.number || patient?.mobileNumber || patient?.mobile || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Age</span>
+            <div class="readonly-value">{{ patient?.age ?? 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Gender</span>
+            <div class="readonly-value">{{ patient?.gender || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Date of Birth</span>
+            <div class="readonly-value">{{ patient?.dob || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Blood Group</span>
+            <div class="readonly-value">{{ patient?.bloodGroup || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Appointment No.</span>
+            <div class="readonly-value">{{ request?.appointmentId || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Req Date</span>
+            <div class="readonly-value">{{ getAppointmentDate() }}</div>
+          </label>
+
+          <label class="field">
+            <span>Req Time</span>
+            <div class="readonly-value">{{ getAppointmentTime() }}</div>
+          </label>
+
+          <label class="field full-width">
+            <span>Address</span>
+            <div class="readonly-value large">{{ patient?.address || 'N/A' }}</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon green">
+            <i class="fa-solid fa-stethoscope"></i>
+          </span>
+          <h2>Visit Details</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Visit Date</span>
+            <input type="date" name="visitDate" [(ngModel)]="createPatientReq.visitDate" />
+          </label>
+
+          <label class="field">
+            <span>Visit Time</span>
+            <input type="time" name="visitTime" step="0.001" [(ngModel)]="createPatientReq.visitTime" />
+          </label>
+
+          <label class="field">
+            <span>Consulting Doctor</span>
+            <select name="cdId" [(ngModel)]="createPatientReq.cdId" (ngModelChange)="setDepartmentFromDoctor($event)">
+              <option value="" disabled>Select doctor</option>
+              @for (doctor of doctors(); track doctor.cdId || doctor.id || doctor._id || doctor.name) {
+              <option [value]="doctor.cdId || doctor.id || doctor._id">
+                {{ doctor.name }}
+              </option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Department</span>
+            <input type="text" name="department" placeholder="Auto filled from doctor"
+              [(ngModel)]="createPatientReq.department" readonly />
+          </label>
+
+          <div class="field doctor-type-field">
+            <span>Doctor Type</span>
+            <div class="doctor-type-value" [class.empty]="!selectedDoctorTypeLabel">
+              @if (selectedDoctorTypeLabel) {
+              <strong class="doctor-type-label" [class.regular]="selectedDoctorTypeClass === 'regular'"
+                [class.visiter]="selectedDoctorTypeClass === 'visiter'">
+                {{ selectedDoctorTypeLabel }}
+              </strong>
+              } @else {
+              <span class="doctor-type-placeholder">Select doctor</span>
+              }
+            </div>
+          </div>
+
+          <label class="field">
+            <span>Priority</span>
+            <select name="priority" [(ngModel)]="createPatientReq.priority">
+              <option value="" disabled>Select priority</option>
+              <option>Normal</option>
+              <option>Urgent</option>
+              <option>Critical</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon amber">
+            <i class="fa-solid fa-notes-medical"></i>
+          </span>
+          <h2>Medical Information</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field full-width">
+            <span>Symptoms</span>
+            <textarea name="symptoms" rows="2" placeholder="Enter symptoms"
+              [(ngModel)]="createPatientReq.symptoms"></textarea>
+          </label>
+
+          <label class="field">
+            <span>Allergies</span>
+            <input type="text" name="allergies" placeholder="Enter allergies"
+              [(ngModel)]="createPatientReq.allergies" />
+          </label>
+
+          <label class="field">
+            <span>Current Medication</span>
+            <input type="text" name="currentMedication" placeholder="Enter current medication"
+              [(ngModel)]="createPatientReq.currentMedication" />
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <span class="section-icon red">
+            <i class="fa-solid fa-phone-volume"></i>
+          </span>
+          <h2>Emergency Contact</h2>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Contact Name</span>
+            <div class="readonly-value">{{ patient?.emergencyContactName || patient?.emergencyContact?.name || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Relation</span>
+            <div class="readonly-value">{{ patient?.emergencyContactRelation || patient?.emergencyContact?.relation || 'N/A' }}</div>
+          </label>
+
+          <label class="field">
+            <span>Contact Number</span>
+            <div class="readonly-value">{{ patient?.emergencyContactNumber || patient?.emergencyContact?.number || patient?.emergencyContact?.phone || 'N/A' }}</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-action" [disabled]="saving" (click)="activeModal.close()">Close</button>
+        <button type="button" class="primary-action" [disabled]="saving" (click)="submitAppointment()">
+          @if (saving) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Submitting...</span>
+          } @else {
+          <i class="fa-regular fa-floppy-disk"></i>
+          <span>Submit</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,95 @@
+<section class="patient-list-page appointment-request-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Management Module</p>
+      <h1>Appointment Req</h1>
+    </div>
+
+    <button type="button" class="primary-action" (click)="loadAppointments()">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="summary-grid appointment-request-summary">
+    <div class="summary-card">
+      <div class="summary-icon amber">
+        <i class="fa-regular fa-calendar-plus"></i>
+      </div>
+      <div>
+        <span class="summary-label">Appointment Requests</span>
+        <strong>{{ totalRequests }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon green">
+        <i class="fa-solid fa-calendar-day"></i>
+      </div>
+      <div>
+        <span class="summary-label">Today Requests</span>
+        <strong>{{ todayRequests }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Search request" [value]="searchText"
+        (input)="setSearchText($any($event.target).value)" />
+    </label>
+  </div>
+
+  <div class="patient-table-panel">
+    <div class="table-responsive">
+      <table class="patient-table appointment-request-table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Action</th>
+            <th>Appointment No.</th>
+            <th>Patient No.</th>
+            <th>Req Date</th>
+            <th>Req Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+          <tr>
+            <td colspan="6" class="empty-state">Loading appointment requests...</td>
+          </tr>
+          } @else if (errorMessage) {
+          <tr>
+            <td colspan="6" class="empty-state error">{{ errorMessage }}</td>
+          </tr>
+          } @else if (appointmentRequestList().length === 0) {
+          <tr>
+            <td colspan="6" class="empty-state">No appointment requests found.</td>
+          </tr>
+          } @else {
+          @for (appointment of appointmentRequestList(); track $index; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="approve-action" aria-label="Approve appointment request" (click)="approveRequest(appointment)">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+                <button type="button" class="danger-action" aria-label="Delete appointment request" (click)="deleteRequest(appointment)">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+            <td>{{ appointment.appointmentId }}</td>
+            <td>{{ appointment.patientId }}</td>
+            <td>{{ getAppointmentDate(appointment) }}</td>
+            <td>{{ getAppointmentTime(appointment) }}</td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

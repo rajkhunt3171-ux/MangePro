@@ -1,0 +1,116 @@
+@use "../../MD/OPD/patient-list/view-patient-modal/view-patient-modal.scss";
+
+.section-icon.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.section-icon.red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  font-size: 14px;
+  min-height: 44px;
+  outline: 0;
+  padding: 10px 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  width: 100%;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  background: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+}
+
+.field input[readonly] {
+  color: #64748b;
+}
+
+.field textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.primary-action {
+  align-items: center;
+  background: var(--primary-color);
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.primary-action:hover {
+  background: #12345c;
+}
+
+.primary-action:disabled,
+.secondary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.doctor-type-field {
+  min-width: 0;
+}
+
+.doctor-type-value {
+  align-items: center;
+  display: flex;
+  min-height: 44px;
+}
+
+.doctor-type-value.empty {
+  color: #94a3b8;
+}
+
+.doctor-type-label {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+  min-height: 32px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.doctor-type-label.regular {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.doctor-type-label.visiter {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.doctor-type-placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+}

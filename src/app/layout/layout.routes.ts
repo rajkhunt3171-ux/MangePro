@@ -10,6 +10,7 @@ import { IpdAdmission } from '../MD/IPD/ipd-admission/ipd-admission';
 import { IpdManagement } from '../MD/IPD/ipd-management/ipd-management';
 import { WardManagement } from '../MD/IPD/ward-management/ward-management';
 import { AppointmentManage } from '../MM/appointment-manage/appointment-manage';
+import { AppointmentRequest } from '../MM/appointment-request/appointment-request';
 import { BillingInvoice } from '../MM/billing-invoice/billing-invoice';
 
 export const layOutRoutes: Routes = [
@@ -71,6 +72,10 @@ export const layOutRoutes: Routes = [
   {
     path: 'appointment-manage',
     component: AppointmentManage,
+  },
+  {
+    path: 'appointment-req',
+    component: AppointmentRequest,
   },
   {
     path: 'billing',
