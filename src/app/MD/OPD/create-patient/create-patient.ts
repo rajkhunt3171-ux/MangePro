@@ -34,6 +34,7 @@ export class CreatePatient implements OnInit {
   savePatient() {
     const payload = {
       ...this.createPatientReq,
+      isNewPatient: Boolean(this.createPatientReq.isNewPatient),
       age: this.createPatientReq.age === null ? null : Number(this.createPatientReq.age),
     };
 

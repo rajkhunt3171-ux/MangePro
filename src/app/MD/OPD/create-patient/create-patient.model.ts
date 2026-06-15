@@ -1,4 +1,5 @@
 export class createPatientReq {
+  isNewPatient = true;
   name = '';
   number = '';
   age: number | null = null;
