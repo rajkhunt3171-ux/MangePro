@@ -4,11 +4,6 @@
       <p class="eyebrow">Management Module</p>
       <h1>Appointment Management</h1>
     </div>
-
-    <button type="button" class="primary-action" (click)="openCreateAppointment()">
-      <i class="fa-solid fa-plus"></i>
-      <span>New Appointment</span>
-    </button>
   </div>
 
   <div class="summary-grid">
@@ -87,7 +82,6 @@
       <button type="button" class="filter" [class.active]="statusFilter === 'Completed'" (click)="setStatusFilter('Completed')">Completed</button>
     </div>
   </div>
-
   <div class="patient-table-panel">
     <div class="table-responsive">
       <table class="patient-table appointment-table">
@@ -148,9 +142,6 @@
             <td><span [class]="'admit-status ' + getAdmitStatusClass(appointment)">{{ getAdmitStatusLabel(appointment) }}</span></td>
             <td>
               <div class="row-actions">
-                <button type="button" aria-label="Edit appointment">
-                  <i class="fa-regular fa-pen-to-square"></i>
-                </button>
                 <button
                   type="button"
                   class="danger-action"

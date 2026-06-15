@@ -32,7 +32,27 @@ export class PatientListForDoctor implements OnInit {
 
     this.patientListForDoctorService.getPatientListForDoctor().subscribe({
       next: (res) => {
-        this.patients.set(this.getDoctorPatients(res.patientList || []));
+        const appointments = (res?.patientList || [])
+          .map((patient: any) => {
+            const visits = patient?.visitData || [];
+            const latestVisit = visits[0];
+
+            if (!latestVisit) {
+              return null;
+            }
+
+            return {
+              ...patient,
+              ...latestVisit,
+              appointmentId: latestVisit.visitId,
+              latestVisit,
+              visitData: [latestVisit],
+              allVisitData: visits,
+            };
+          })
+          .filter(Boolean);
+
+        this.patients.set(appointments);
         this.loading = false;
       },
       error: (err) => {
@@ -180,12 +200,7 @@ export class PatientListForDoctor implements OnInit {
   }
 
   isPatientAdmitted(patient: any) {
-    const admittedValue =
-      patient?.idAdmitted ??
-      patient?.isAdmitted ??
-      patient?.admitted ??
-      patient?.is_admitted ??
-      patient?.admission?.idAdmitted;
+    const admittedValue = patient?.idAdmitted
 
     if (typeof admittedValue === 'boolean') {
       return admittedValue;
@@ -284,37 +299,5 @@ export class PatientListForDoctor implements OnInit {
       return 'Urgent';
     }
     return 'Normal';
-  }
-
-  private getDoctorPatients(patientList: any[]) {
-    const doctorIds = this.getLoggedDoctorIds();
-    if (!doctorIds.length) {
-      return [];
-    }
-
-    return patientList.filter((patient) => doctorIds.includes(this.getPatientDoctorId(patient)));
-  }
-
-  private getLoggedDoctorIds() {
-    const doctor = this.sharedService.userDetails || {};
-    return [
-      localStorage.getItem('id'),
-      doctor.id,
-      doctor._id,
-      doctor.cdId,
-    ]
-      .filter((value) => value !== undefined && value !== null && value !== '')
-      .map((value) => String(value));
-  }
-
-  private getPatientDoctorId(patient: any) {
-    return String(
-      patient?.cdId ||
-      patient?.doctorId ||
-      patient?.doctor?.cdId ||
-      patient?.doctor?.id ||
-      patient?.doctor?._id ||
-      '',
-    );
   }
 }

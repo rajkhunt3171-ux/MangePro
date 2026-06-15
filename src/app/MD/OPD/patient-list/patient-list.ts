@@ -4,6 +4,7 @@ import { ToastService } from '../../../shared/service/toast-service';
 import { CreatePatient } from '../create-patient/create-patient';
 import { DeletePatientModal } from './delete-patient-modal/delete-patient-modal';
 import { PatientListService } from './patient-list-service';
+import { ViewPatientModal } from './view-patient-modal/view-patient-modal';
 
 @Component({
   selector: 'app-patient-list',
@@ -187,6 +188,22 @@ export class PatientList implements OnInit {
     modalRef.result.then((patientId) => {
       if (patientId) {
         this.patients.update((patients) => patients.filter((item) => item.patientId !== patientId));
+      }
+    }).catch(() => { });
+  }
+
+  openViewPatient(patient: any) {
+    const modalRef = this.modalService.open(ViewPatientModal, {
+      backdrop: 'static',
+      scrollable: true,
+      size: 'xl',
+    });
+
+    modalRef.componentInstance.patient = patient;
+
+    modalRef.result.then((updatedPatient) => {
+      if (updatedPatient) {
+        this.loadPatients();
       }
     }).catch(() => { });
   }

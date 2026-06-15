@@ -48,6 +48,63 @@
   gap: 16px;
 }
 
+.patient-tabs {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px;
+}
+
+.patient-tab {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #475569;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.patient-tab:hover {
+  background: #ffffff;
+  border-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.patient-tab.active {
+  background: #ffffff;
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  color: #1d4ed8;
+}
+
+.patient-tab small {
+  align-items: center;
+  background: #e0f2fe;
+  border-radius: 999px;
+  color: #0369a1;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  height: 20px;
+  justify-content: center;
+  min-width: 20px;
+  padding: 0 6px;
+}
+
+.tab-panel {
+  min-height: 280px;
+}
+
 .form-section {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -92,6 +149,16 @@
   color: #b45309;
 }
 
+.section-icon.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.section-icon.purple {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
 .form-grid {
   display: grid;
   gap: 16px;
@@ -133,6 +200,35 @@
 .readonly-value.large {
   align-items: flex-start;
   min-height: 96px;
+}
+
+.readonly-value.badge-value {
+  background: #ffffff;
+}
+
+.inline-badge {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.inline-badge.priority.normal {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.inline-badge.priority.urgent {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.inline-badge.priority.critical {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .status-control {
@@ -309,6 +405,63 @@
   gap: 6px;
   min-height: 32px;
   padding: 7px 12px;
+}
+
+.visit-table-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.visit-table {
+  border-collapse: collapse;
+  min-width: 1180px;
+  width: 100%;
+}
+
+.visit-table thead {
+  background: #f8fafc;
+}
+
+.visit-table th,
+.visit-table td {
+  border-top: 1px solid #edf2f7;
+  color: #475569;
+  font-size: 13px;
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.visit-table th {
+  border-top: 0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.visit-table td:nth-child(8),
+.visit-table td:nth-child(9) {
+  max-width: 220px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.empty-visit-state {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  display: flex;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  min-height: 96px;
+  padding: 18px;
 }
 
 @keyframes checkInPulse {

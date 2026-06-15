@@ -33,7 +33,13 @@ export class IpdAdmission implements OnInit {
     this.patientListService.getPatientList().subscribe({
       next: (res) => {
         const patientList = res?.patientList || res?.patients || res?.data || [];
-        this.patients.set(Array.isArray(patientList) ? patientList : []);
+        const normalizedPatients = Array.isArray(patientList)
+          ? patientList
+            .map((patient: any) => this.withLatestVisit(patient))
+            .filter(Boolean)
+          : [];
+
+        this.patients.set(normalizedPatients);
         this.loading = false;
       },
       error: (err) => {
@@ -77,6 +83,7 @@ export class IpdAdmission implements OnInit {
       const searchableText = [
         patient?.patientId,
         patient?.name,
+        patient?.number,
         patient?.mobile,
         patient?.phone,
         patient?.cdId,
@@ -113,11 +120,11 @@ export class IpdAdmission implements OnInit {
   }
 
   getDoctorName(patient: any) {
-    return patient?.doctorName || patient?.doctor?.name || patient?.cdId || 'N/A';
+    return patient?.doctorName || patient?.doctor?.name || patient?.cdId || patient?.latestVisit?.cdId || 'N/A';
   }
 
   getPatientPriority(patient: any) {
-    const priority = String(patient?.priority || '').trim().toLowerCase();
+    const priority = String(patient?.priority || patient?.latestVisit?.priority || '').trim().toLowerCase();
 
     if (priority === 'critical') {
       return 'Critical';
@@ -135,7 +142,7 @@ export class IpdAdmission implements OnInit {
   }
 
   getPatientStatus(patient: any) {
-    const status = String(patient?.status || '').trim().toLowerCase();
+    const status = String(patient?.status || patient?.latestVisit?.status || '').trim().toLowerCase();
 
     if (status === 'checked-in' || status === 'checked in') {
       return 'Checked In';
@@ -164,7 +171,7 @@ export class IpdAdmission implements OnInit {
   }
 
   getVisitDate(patient: any) {
-    const dateKey = this.getDateKey(patient?.visitDate);
+    const dateKey = this.getDateKey(patient?.visitDate || patient?.latestVisit?.visitDate);
 
     return dateKey ? this.formatDateForDisplay(dateKey) : 'N/A';
   }
@@ -173,6 +180,7 @@ export class IpdAdmission implements OnInit {
     return (
       patient?.bedName ||
       patient?.bedId ||
+      patient?.latestVisit?.bedId ||
       patient?.admission?.bedName ||
       patient?.admission?.bedId ||
       'Not Allocated'
@@ -213,11 +221,19 @@ export class IpdAdmission implements OnInit {
   }
 
   isPatientAdmitted(patient: any) {
+    if (this.isPatientDischarged(patient)) {
+      return false;
+    }
+
     const admittedValue =
       patient?.idAdmitted ??
       patient?.isAdmitted ??
       patient?.admitted ??
       patient?.is_admitted ??
+      patient?.latestVisit?.idAdmitted ??
+      patient?.latestVisit?.isAdmitted ??
+      patient?.latestVisit?.admitted ??
+      patient?.latestVisit?.is_admitted ??
       patient?.admission?.idAdmitted;
 
     if (typeof admittedValue === 'boolean') {
@@ -236,7 +252,74 @@ export class IpdAdmission implements OnInit {
   }
 
   private getAdmissionDateValue(patient: any) {
-    return patient?.admissionDate || patient?.admittedAt || patient?.admission?.admissionDate || patient?.admission?.date;
+    return (
+      patient?.admissionDate ||
+      patient?.admittedAt ||
+      patient?.latestVisit?.admissionDate ||
+      patient?.latestVisit?.admittedAt ||
+      patient?.admission?.admissionDate ||
+      patient?.admission?.date
+    );
+  }
+
+  private withLatestVisit(patient: any) {
+    const visits = Array.isArray(patient?.visitData) ? patient.visitData : [];
+    const latestVisit = this.getLatestVisit(visits);
+
+    if (!latestVisit) {
+      return patient;
+    }
+
+    return {
+      ...patient,
+      ...latestVisit,
+      latestVisit,
+      visitData: [latestVisit],
+      allVisitData: visits,
+    };
+  }
+
+  private getLatestVisit(visits: any[]) {
+    return [...visits].sort((first, second) => this.getVisitTimestamp(second) - this.getVisitTimestamp(first))[0];
+  }
+
+  private getVisitTimestamp(visit: any) {
+    const dateValue = visit?.visitDate || visit?.admissionDate || '';
+    const timeValue = visit?.visitTime || '00:00:00';
+    const parsedDate = new Date(`${dateValue}T${timeValue}`);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate.getTime();
+    }
+
+    const fallbackDate = new Date(dateValue || timeValue);
+    return Number.isNaN(fallbackDate.getTime()) ? 0 : fallbackDate.getTime();
+  }
+
+  private isPatientDischarged(patient: any) {
+    const dischargedValue =
+      patient?.idDischarge ??
+      patient?.isDischarged ??
+      patient?.discharged ??
+      patient?.is_discharged ??
+      patient?.latestVisit?.idDischarge ??
+      patient?.latestVisit?.isDischarged ??
+      patient?.latestVisit?.discharged ??
+      patient?.latestVisit?.is_discharged;
+
+    if (typeof dischargedValue === 'boolean') {
+      return dischargedValue;
+    }
+
+    const normalizedValue = String(dischargedValue ?? '').trim().toLowerCase();
+
+    return (
+      normalizedValue === 'true' ||
+      normalizedValue === '1' ||
+      normalizedValue === 'yes' ||
+      normalizedValue === 'discharged' ||
+      !!(patient?.dischargeDate || patient?.latestVisit?.dischargeDate)
+    );
   }
 
   private getTodayDateKey() {

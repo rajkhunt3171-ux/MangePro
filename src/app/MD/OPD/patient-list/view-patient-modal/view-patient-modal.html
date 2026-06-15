@@ -74,82 +74,255 @@
   </header>
 
   <div class="modal-body patient-modal-body">
+    @let latestVisit = getLatestVisit();
+    @let patientVisits = getPatientVisits();
+
     <div class="patient-form">
-      <div class="form-section">
-        <div class="section-title">
-          <span class="section-icon blue">
-            <i class="fa-regular fa-user"></i>
-          </span>
-          <h2>Patient Details</h2>
-        </div>
-
-        <div class="form-grid">
-          <label class="field">
-            <span>Patient ID</span>
-            <div class="readonly-value">{{ patient?.patientId || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Full Name</span>
-            <div class="readonly-value">{{ patient?.name || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Mobile Number</span>
-            <div class="readonly-value">{{ patient?.number || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Age</span>
-            <div class="readonly-value">{{ patient?.age ?? 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Gender</span>
-            <div class="readonly-value">{{ patient?.gender || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Date of Birth</span>
-            <div class="readonly-value">{{ patient?.dob || 'N/A' }}</div>
-          </label>
-
-          <label class="field">
-            <span>Blood Group</span>
-            <div class="readonly-value">{{ patient?.bloodGroup || 'N/A' }}</div>
-          </label>
-
-          <label class="field full-width">
-            <span>Address</span>
-            <div class="readonly-value large">{{ patient?.address || 'N/A' }}</div>
-          </label>
-        </div>
+      <div class="patient-tabs" role="tablist" aria-label="Patient detail tabs">
+        <button type="button" class="patient-tab" [class.active]="isActiveTab('patient')"
+          [attr.aria-selected]="isActiveTab('patient')" role="tab" (click)="setActiveTab('patient')">
+          <i class="fa-regular fa-user"></i>
+          <span>Patient</span>
+        </button>
+        <button type="button" class="patient-tab" [class.active]="isActiveTab('visit')"
+          [attr.aria-selected]="isActiveTab('visit')" role="tab" (click)="setActiveTab('visit')">
+          <i class="fa-solid fa-notes-medical"></i>
+          <span>Latest Visit</span>
+        </button>
+        <button type="button" class="patient-tab" [class.active]="isActiveTab('contact')"
+          [attr.aria-selected]="isActiveTab('contact')" role="tab" (click)="setActiveTab('contact')">
+          <i class="fa-solid fa-phone-volume"></i>
+          <span>Emergency</span>
+        </button>
+        <button type="button" class="patient-tab" [class.active]="isActiveTab('history')"
+          [attr.aria-selected]="isActiveTab('history')" role="tab" (click)="setActiveTab('history')">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Visit History</span>
+          <small>{{ patientVisits.length }}</small>
+        </button>
       </div>
 
-      <div class="form-section">
-        <div class="section-title">
-          <span class="section-icon amber">
-            <i class="fa-solid fa-notes-medical"></i>
-          </span>
-          <h2>Medical Information</h2>
+      <div class="tab-panel" role="tabpanel">
+        @if (isActiveTab('patient')) {
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon blue">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <h2>Patient Details</h2>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              <span>Patient ID</span>
+              <div class="readonly-value">{{ patient?.patientId || 'N/A' }}</div>
+            </label>
+
+            <label class="field">
+              <span>Full Name</span>
+              <div class="readonly-value">{{ patient?.name || 'N/A' }}</div>
+            </label>
+
+            <label class="field">
+              <span>Mobile Number</span>
+              <div class="readonly-value">{{ getDisplayValue(patient?.number || patient?.mobileNumber || patient?.mobile || patient?.phone) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Age</span>
+              <div class="readonly-value">{{ patient?.age ?? 'N/A' }}</div>
+            </label>
+
+            <label class="field">
+              <span>Gender</span>
+              <div class="readonly-value">{{ patient?.gender || 'N/A' }}</div>
+            </label>
+
+            <label class="field">
+              <span>Date of Birth</span>
+              <div class="readonly-value">{{ getFormattedDate(patient?.dob) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Blood Group</span>
+              <div class="readonly-value">{{ patient?.bloodGroup || 'N/A' }}</div>
+            </label>
+
+            <label class="field full-width">
+              <span>Address</span>
+              <div class="readonly-value large">{{ patient?.address || 'N/A' }}</div>
+            </label>
+          </div>
         </div>
+        } @else if (isActiveTab('visit')) {
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon amber">
+              <i class="fa-solid fa-notes-medical"></i>
+            </span>
+            <h2>Latest Visit Information</h2>
+          </div>
 
-        <div class="form-grid">
-          <label class="field full-width">
-            <span>Symptoms</span>
-            <div class="readonly-value large">{{ patient?.symptoms || 'N/A' }}</div>
-          </label>
+          <div class="form-grid">
+            <label class="field">
+              <span>Visit ID</span>
+              <div class="readonly-value">{{ getDisplayValue(getVisitValue('visitId')) }}</div>
+            </label>
 
-          <label class="field">
-            <span>Allergies</span>
-            <div class="readonly-value">{{ patient?.allergies || 'N/A' }}</div>
-          </label>
+            <label class="field">
+              <span>Visit Date</span>
+              <div class="readonly-value">{{ getFormattedDate(getVisitValue('visitDate')) }}</div>
+            </label>
 
-          <label class="field">
-            <span>Current Medication</span>
-            <div class="readonly-value">{{ patient?.currentMedication || 'N/A' }}</div>
-          </label>
+            <label class="field">
+              <span>Visit Time</span>
+              <div class="readonly-value">{{ getFormattedTime(getVisitValue('visitTime')) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Doctor ID</span>
+              <div class="readonly-value">{{ getDisplayValue(getVisitValue('cdId')) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Department</span>
+              <div class="readonly-value">{{ getDisplayValue(getVisitValue('department')) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Priority</span>
+              <div class="readonly-value badge-value">
+                <span [class]="'inline-badge priority ' + getVisitPriorityClass(latestVisit)">
+                  {{ getVisitPriority(latestVisit) }}
+                </span>
+              </div>
+            </label>
+
+            <label class="field">
+              <span>Status</span>
+              <div class="readonly-value badge-value">
+                <span [class]="'status-badge ' + getVisitStatusClass(latestVisit)">
+                  {{ getVisitStatus(latestVisit) }}
+                </span>
+              </div>
+            </label>
+
+            <label class="field">
+              <span>Admitted</span>
+              <div class="readonly-value">{{ isVisitAdmitted(latestVisit) ? 'Yes' : 'No' }}</div>
+            </label>
+
+            <label class="field">
+              <span>Bed ID</span>
+              <div class="readonly-value">{{ getDisplayValue(getVisitValue('bedId')) }}</div>
+            </label>
+
+            <label class="field full-width">
+              <span>Symptoms</span>
+              <div class="readonly-value large">{{ getDisplayValue(getVisitValue('symptoms')) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Allergies</span>
+              <div class="readonly-value">{{ getDisplayValue(getVisitValue('allergies')) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Current Medication</span>
+              <div class="readonly-value">{{ getDisplayValue(patient?.currentMedication) }}</div>
+            </label>
+          </div>
         </div>
+        } @else if (isActiveTab('contact')) {
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon green">
+              <i class="fa-solid fa-phone-volume"></i>
+            </span>
+            <h2>Emergency Contact</h2>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              <span>Name</span>
+              <div class="readonly-value">{{ getDisplayValue(patient?.emergencyContactName) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Relation</span>
+              <div class="readonly-value">{{ getDisplayValue(patient?.emergencyContactRelation) }}</div>
+            </label>
+
+            <label class="field">
+              <span>Mobile Number</span>
+              <div class="readonly-value">{{ getDisplayValue(patient?.emergencyContactNumber) }}</div>
+            </label>
+          </div>
+        </div>
+        } @else {
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon purple">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </span>
+            <h2>Visit History</h2>
+          </div>
+
+          @if (patientVisits.length) {
+          <div class="visit-table-wrap">
+            <table class="visit-table">
+              <thead>
+                <tr>
+                  <th>Visit ID</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Doctor</th>
+                  <th>Department</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Symptoms</th>
+                  <th>Allergies</th>
+                  <th>Admit</th>
+                  <th>Discharge</th>
+                  <th>Bed</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (visit of patientVisits; track visit?.visitId || $index) {
+                <tr>
+                  <td>{{ getDisplayValue(visit?.visitId) }}</td>
+                  <td>{{ getFormattedDate(visit?.visitDate) }}</td>
+                  <td>{{ getFormattedTime(visit?.visitTime) }}</td>
+                  <td>{{ getDisplayValue(visit?.cdId) }}</td>
+                  <td>{{ getDisplayValue(visit?.department) }}</td>
+                  <td>
+                    <span [class]="'inline-badge priority ' + getVisitPriorityClass(visit)">
+                      {{ getVisitPriority(visit) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="'status-badge ' + getVisitStatusClass(visit)">
+                      {{ getVisitStatus(visit) }}
+                    </span>
+                  </td>
+                  <td>{{ getDisplayValue(visit?.symptoms) }}</td>
+                  <td>{{ getDisplayValue(visit?.allergies) }}</td>
+                  <td>{{ isVisitAdmitted(visit) ? getFormattedDate(visit?.admissionDate) : 'No' }}</td>
+                  <td>{{ isVisitDischarged(visit) ? getFormattedDate(visit?.dischargeDate) : 'No' }}</td>
+                  <td>{{ getDisplayValue(visit?.bedId) }}</td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          } @else {
+          <div class="empty-visit-state">
+            <i class="fa-regular fa-calendar-xmark"></i>
+            <span>No visit data found.</span>
+          </div>
+          }
+        </div>
+        }
       </div>
 
       <div class="form-actions">

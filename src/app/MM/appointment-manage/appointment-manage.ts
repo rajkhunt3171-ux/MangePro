@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CreatePatient } from '../../MD/OPD/create-patient/create-patient';
 import { DeletePatientModal } from '../../MD/OPD/patient-list/delete-patient-modal/delete-patient-modal';
 import { PatientListService } from '../../MD/OPD/patient-list/patient-list-service';
 import { ViewPatientModal } from '../../MD/OPD/patient-list/view-patient-modal/view-patient-modal';
@@ -20,8 +19,8 @@ export class AppointmentManage implements OnInit {
 
   constructor(
     private modalService: NgbModal,
-    private patientListService: PatientListService,
-  ) { }
+    private patientListService: PatientListService
+  ) {}
 
   ngOnInit() {
     this.loadAppointments();
@@ -32,16 +31,35 @@ export class AppointmentManage implements OnInit {
     this.errorMessage = '';
 
     this.patientListService.getPatientList().subscribe({
-      next: (res) => {
-        const appointmentList = res?.appointmentList || res?.appointments || res?.patientList || res?.data || [];
-        this.appointments.set(Array.isArray(appointmentList) ? appointmentList : []);
+      next: (res: any) => {
+        const appointments = (res?.patientList || [])
+          .map((patient: any) => {
+            const visits = this.sortVisitsByLatest(patient?.visitData || []);
+            const latestVisit = visits[0];
+
+            if (!latestVisit) {
+              return null;
+            }
+
+            return {
+              ...patient,
+              ...latestVisit,
+              appointmentId: latestVisit.visitId,
+              latestVisit,
+              visitData: [latestVisit],
+              allVisitData: visits,
+            };
+          })
+          .filter(Boolean);
+
+        this.appointments.set(this.sortAppointmentsByLatest(appointments));
         this.loading = false;
+        console.log('Loaded Appointments:', appointments);
       },
       error: (err) => {
         this.loading = false;
         this.appointments.set([]);
-        this.errorMessage = err?.error?.message || 'Appointments load karvama error aavyo.';
-        console.error('Error loading appointments', err);
+        this.errorMessage = err?.error?.message || 'Something went wrong';
       },
     });
   }
@@ -51,23 +69,33 @@ export class AppointmentManage implements OnInit {
   }
 
   get todayAppointments() {
-    return this.appointments().filter((appointment) => this.isTodayVisit(appointment)).length;
+    const today = new Date().toISOString().split('T')[0];
+
+    return this.appointments().filter(
+      (appointment) => appointment?.latestVisit?.visitDate === today
+    ).length;
+  }
+
+  private getStatusCount(status: string) {
+    return this.appointments().filter(
+      (appointment) => appointment?.latestVisit?.status === status
+    ).length;
   }
 
   get waitingAppointments() {
-    return this.appointments().filter((appointment) => this.getAppointmentStatus(appointment) === 'Waiting').length;
+    return this.getStatusCount('Waiting');
   }
 
   get checkedInAppointments() {
-    return this.appointments().filter((appointment) => this.getAppointmentStatus(appointment) === 'Checked In').length;
+    return this.getStatusCount('Checked In');
   }
 
   get consultedAppointments() {
-    return this.appointments().filter((appointment) => this.getAppointmentStatus(appointment) === 'Consulted').length;
+    return this.getStatusCount('Consulted');
   }
 
   get completedAppointments() {
-    return this.appointments().filter((appointment) => this.getAppointmentStatus(appointment) === 'Completed').length;
+    return this.getStatusCount('Completed');
   }
 
   setSearchText(value: string) {
@@ -82,9 +110,11 @@ export class AppointmentManage implements OnInit {
     const search = this.searchText.trim().toLowerCase();
 
     return this.appointments().filter((appointment) => {
-      const statusMatches = this.statusFilter === 'All' || this.getAppointmentStatus(appointment) === this.statusFilter;
+      const status = this.getAppointmentStatus(appointment);
+      const statusMatch = this.statusFilter === 'All' || status === this.statusFilter;
+
       if (!search) {
-        return statusMatches;
+        return statusMatch;
       }
 
       const searchableText = [
@@ -92,145 +122,144 @@ export class AppointmentManage implements OnInit {
         appointment?.appointmentId,
         appointment?.name,
         appointment?.number,
-        appointment?.cdId,
-        appointment?.doctorName,
-        appointment?.doctor?.name,
-        appointment?.dateandtime,
-        appointment?.dateAndTime,
-      ].filter(Boolean).join(' ').toLowerCase();
+        appointment?.latestVisit?.cdId,
+        appointment?.latestVisit?.department,
+        appointment?.latestVisit?.status,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
 
-      return statusMatches && searchableText.includes(search);
+      return statusMatch && searchableText.includes(search);
     });
   }
 
+  getAppointmentStatus(appointment: any) {
+    return appointment?.latestVisit?.status || 'Waiting';
+  }
+
   getAppointmentId(appointment: any) {
-    return appointment?.appointmentId || appointment?.patientId || appointment?.id || 'N/A';
+    return appointment?.appointmentId || appointment?.patientId || 'N/A';
   }
 
   getPatientInitials(appointment: any) {
     const name = appointment?.name || '';
-    const initials = name
-      .split(' ')
-      .filter(Boolean)
-      .map((part: string) => part[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
-    return initials || 'NA';
+
+    return (
+      name
+        .split(' ')
+        .filter(Boolean)
+        .map((part: string) => part[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase() || 'NA'
+    );
   }
 
   getAvatarClass(index: number) {
-    const classes = ['avatar', 'avatar soft-green', 'avatar soft-amber', 'avatar soft-purple', 'avatar soft-red'];
+    const classes = [
+      'avatar',
+      'avatar soft-green',
+      'avatar soft-amber',
+      'avatar soft-purple',
+      'avatar soft-red',
+    ];
+
     return classes[index % classes.length];
   }
 
   getAgeGender(appointment: any) {
-    const age = appointment?.age ?? 'N/A';
-    const gender = appointment?.gender || 'N/A';
-    return `${age} / ${gender}`;
+    return `${appointment?.age ?? 'N/A'} / ${appointment?.gender || 'N/A'}`;
   }
 
   getDoctorName(appointment: any) {
-    return appointment?.doctorName || appointment?.doctor?.name || appointment?.cdName || appointment?.cdId || 'N/A';
+    return appointment?.latestVisit?.cdName || appointment?.latestVisit?.cdId || 'N/A';
   }
 
   getAppointmentDate(appointment: any) {
-    const value = this.getAppointmentDateValue(appointment);
-    if (!value) {
+    const date = appointment?.latestVisit?.visitDate;
+
+    if (!date) {
       return 'N/A';
     }
 
-    const dateKey = this.getDateKey(value);
-    return dateKey ? this.formatDateForDisplay(dateKey) : value;
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
   }
 
   getAppointmentTime(appointment: any) {
-    const value = this.getAppointmentTimeValue(appointment);
-    if (!value) {
+    const time = appointment?.latestVisit?.visitTime;
+
+    if (!time) {
       return 'N/A';
     }
 
-    const combinedDateTimeMatch = String(value).trim().match(/^\d{4}-\d{2}-\d{2}\s+(\d{2}:\d{2})/);
-    if (combinedDateTimeMatch) {
-      return new Date(`2000-01-01T${combinedDateTimeMatch[1]}`).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
-
-    if (/^\d{2}:\d{2}/.test(String(value))) {
-      return new Date(`2000-01-01T${value}`).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return time.slice(0, 5);
   }
 
   getAppointmentPriority(appointment: any) {
-    const priority = String(appointment?.priority || '').trim().toLowerCase();
-    if (priority === 'critical') {
-      return 'Critical';
-    }
-    if (priority === 'urgent') {
-      return 'Urgent';
-    }
-    return 'Normal';
+    return appointment?.latestVisit?.priority || 'Normal';
   }
 
-  getAppointmentStatus(appointment: any) {
-    if (appointment?.status) {
-      return this.toTitleStatus(appointment.status);
+  private sortVisitsByLatest(visits: any[]) {
+    return [...visits].sort(
+      (firstVisit, secondVisit) =>
+        this.getVisitDateTimeValue(secondVisit) - this.getVisitDateTimeValue(firstVisit)
+    );
+  }
+
+  private sortAppointmentsByLatest(appointments: any[]) {
+    return [...appointments].sort(
+      (firstAppointment, secondAppointment) =>
+        this.getVisitDateTimeValue(secondAppointment?.latestVisit || secondAppointment) -
+        this.getVisitDateTimeValue(firstAppointment?.latestVisit || firstAppointment)
+    );
+  }
+
+  private getVisitDateTimeValue(visit: any) {
+    const visitDate = String(visit?.visitDate || '').trim();
+
+    if (!visitDate) {
+      return 0;
     }
-    return 'Waiting';
+
+    const visitTime = String(visit?.visitTime || '00:00:00').trim();
+    const normalizedTime = /^\d{2}:\d{2}/.test(visitTime) ? visitTime : '00:00:00';
+    const dateTime = new Date(`${visitDate}T${normalizedTime}`);
+
+    if (!Number.isNaN(dateTime.getTime())) {
+      return dateTime.getTime();
+    }
+
+    const dateOnly = new Date(visitDate);
+    return Number.isNaN(dateOnly.getTime()) ? 0 : dateOnly.getTime();
   }
 
   getStatusClass(appointment: any) {
-    return this.getAppointmentStatus(appointment).toLowerCase().replace(/\s+/g, '-');
+    return this.getAppointmentStatus(appointment)
+      .toLowerCase()
+      .replace(/\s+/g, '-');
   }
 
   updateAppointmentStatus(appointment: any) {
-    const patientId = appointment?.patientId;
-
     this.appointments.update((appointments) =>
-      appointments.map((item) => {
-        const isCurrentAppointment = patientId ? item?.patientId === patientId : item === appointment;
-        return isCurrentAppointment ? { ...item, status: appointment?.status } : item;
-      })
+      appointments.map((item) =>
+        item?.latestVisit?.visitId === appointment?.visitId
+          ? {
+              ...item,
+              latestVisit: {
+                ...item.latestVisit,
+                status: appointment?.status,
+              },
+              status: appointment?.status,
+            }
+          : item
+      )
     );
   }
 
   isPatientAdmitted(appointment: any) {
-    const admittedValue =
-      appointment?.idAdmitted ??
-      appointment?.isAdmitted ??
-      appointment?.admitted ??
-      appointment?.is_admitted ??
-      appointment?.admission?.idAdmitted;
-
-    if (typeof admittedValue === 'boolean') {
-      return admittedValue;
-    }
-
-    const normalizedValue = String(admittedValue ?? '').trim().toLowerCase();
-
-    return (
-      normalizedValue === 'true' ||
-      normalizedValue === '1' ||
-      normalizedValue === 'yes' ||
-      normalizedValue === 'admitted' ||
-      !!appointment?.admissionDate ||
-      !!appointment?.admission?.admissionDate
-    );
+    return appointment?.latestVisit?.idAdmitted === true;
   }
 
   getAdmitStatusLabel(appointment: any) {
@@ -241,59 +270,6 @@ export class AppointmentManage implements OnInit {
     return this.isPatientAdmitted(appointment) ? 'admitted' : 'not-admitted';
   }
 
-  isTodayVisit(appointment: any) {
-    const todayKey = this.getTodayDateKey();
-    const visitDateKey = this.getDateKey(this.getAppointmentDateValue(appointment));
-
-    return visitDateKey === todayKey;
-  }
-
-  getTodayDateKey() {
-    return this.formatDateKey(new Date());
-  }
-
-  getDateKey(value: any) {
-    if (!value) {
-      return '';
-    }
-    if (value instanceof Date) {
-      return this.formatDateKey(value);
-    }
-    const rawValue = String(value).trim();
-    const dateMatch = rawValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (dateMatch) {
-      return `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-    }
-    const parsedDate = new Date(rawValue);
-    if (!Number.isNaN(parsedDate.getTime())) {
-      return this.formatDateKey(parsedDate);
-    }
-    return '';
-  }
-
-  formatDateKey(date: Date) {
-    return [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, '0'),
-      String(date.getDate()).padStart(2, '0'),
-    ].join('-');
-  }
-
-  formatDateForDisplay(dateKey: string) {
-    const [year, month, day] = dateKey.split('-');
-    return `${day}/${month}/${year}`;
-  }
-
-  openCreateAppointment() {
-    const modalRef = this.modalService.open(CreatePatient, {
-      backdrop: 'static',
-      scrollable: true,
-      size: 'xl',
-    });
-
-    modalRef.result.then(() => this.loadAppointments()).catch(() => { });
-  }
-
   openViewAppointment(appointment: any) {
     const modalRef = this.modalService.open(ViewPatientModal, {
       backdrop: 'static',
@@ -302,13 +278,16 @@ export class AppointmentManage implements OnInit {
     });
 
     modalRef.componentInstance.patient = appointment;
-    modalRef.componentInstance.onStatusChange = (selectedAppointment: any) => this.updateAppointmentStatus(selectedAppointment);
+    modalRef.componentInstance.onStatusChange = (selectedAppointment: any) =>
+      this.updateAppointmentStatus(selectedAppointment);
 
-    modalRef.result.then((updatedAppointment) => {
-      if (updatedAppointment) {
-        this.loadAppointments();
-      }
-    }).catch(() => { });
+    modalRef.result
+      .then((updatedAppointment) => {
+        if (updatedAppointment) {
+          this.loadAppointments();
+        }
+      })
+      .catch(() => {});
   }
 
   openDeleteAppointment(appointment: any) {
@@ -319,48 +298,14 @@ export class AppointmentManage implements OnInit {
 
     modalRef.componentInstance.patient = appointment;
 
-    modalRef.result.then((patientId) => {
-      if (patientId) {
-        this.appointments.update((appointments) => appointments.filter((item) => item.patientId !== patientId));
-      }
-    }).catch(() => { });
-  }
-
-  private getAppointmentDateValue(appointment: any) {
-    return (
-      appointment?.appointmentDate ||
-      appointment?.date ||
-      appointment?.dateandtime ||
-      appointment?.dateAndTime ||
-      appointment?.appointmentDateTime ||
-      appointment?.visitDate ||
-      appointment?.createdAt
-    );
-  }
-
-  private getAppointmentTimeValue(appointment: any) {
-    return (
-      appointment?.appointmentTime ||
-      appointment?.time ||
-      appointment?.dateandtime ||
-      appointment?.dateAndTime ||
-      appointment?.appointmentDateTime ||
-      appointment?.visitTime ||
-      appointment?.createdAt
-    );
-  }
-
-  private toTitleStatus(value: any) {
-    const status = String(value || '').trim().toLowerCase();
-    if (status === 'checked-in' || status === 'checked in') {
-      return 'Checked In';
-    }
-    if (status === 'consulted') {
-      return 'Consulted';
-    }
-    if (status === 'completed') {
-      return 'Completed';
-    }
-    return 'Waiting';
+    modalRef.result
+      .then((patientId) => {
+        if (patientId) {
+          this.appointments.update((appointments) =>
+            appointments.filter((item) => item.patientId !== patientId)
+          );
+        }
+      })
+      .catch(() => {});
   }
 }

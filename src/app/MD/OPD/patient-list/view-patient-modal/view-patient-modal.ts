@@ -15,21 +15,141 @@ export class ViewPatientModal {
   statusUpdating = false;
   admitUpdating = false;
   statusErrorMessage = '';
+  activeTab: 'patient' | 'visit' | 'contact' | 'history' = 'patient';
 
   constructor(
     public activeModal: NgbActiveModal,
     private patientListService: PatientListService,
   ) { }
 
+  getPatientVisits() {
+    const allVisitData = this.patient?.allVisitData;
+    const visitData = this.patient?.visitData;
+
+    if (Array.isArray(allVisitData) && allVisitData.length) {
+      return allVisitData;
+    }
+
+    if (Array.isArray(visitData) && visitData.length) {
+      return visitData;
+    }
+
+    if (this.patient?.latestVisit) {
+      return [this.patient.latestVisit];
+    }
+
+    return [];
+  }
+
+  getLatestVisit() {
+    return this.patient?.latestVisit || this.getPatientVisits()[0] || null;
+  }
+
+  getVisitValue(field: string) {
+    const latestVisit = this.getLatestVisit();
+    return latestVisit?.[field] ?? this.patient?.[field] ?? '';
+  }
+
+  getDisplayValue(value: any) {
+    if (value === undefined || value === null || value === '') {
+      return 'N/A';
+    }
+
+    return value;
+  }
+
+  setActiveTab(tab: 'patient' | 'visit' | 'contact' | 'history') {
+    this.activeTab = tab;
+  }
+
+  isActiveTab(tab: 'patient' | 'visit' | 'contact' | 'history') {
+    return this.activeTab === tab;
+  }
+
   getPatientStatus() {
     if (this.patient?.status) {
       return this.toTitleStatus(this.patient.status);
     }
+    const latestVisitStatus = this.getLatestVisit()?.status;
+
+    if (latestVisitStatus) {
+      return this.toTitleStatus(latestVisitStatus);
+    }
+
     return 'Waiting';
   }
 
   getStatusClass() {
     return this.getPatientStatus().toLowerCase().replace(/\s+/g, '-');
+  }
+
+  getVisitStatus(visit: any) {
+    return this.toTitleStatus(visit?.status || this.getPatientStatus());
+  }
+
+  getVisitStatusClass(visit: any) {
+    return this.getVisitStatus(visit).toLowerCase().replace(/\s+/g, '-');
+  }
+
+  getVisitPriority(visit: any) {
+    const priority = String(visit?.priority || this.getVisitValue('priority') || 'Normal').trim().toLowerCase();
+
+    if (priority === 'critical') {
+      return 'Critical';
+    }
+
+    if (priority === 'urgent') {
+      return 'Urgent';
+    }
+
+    return 'Normal';
+  }
+
+  getVisitPriorityClass(visit: any) {
+    return this.getVisitPriority(visit).toLowerCase();
+  }
+
+  getFormattedDate(value: any) {
+    const dateKey = this.getDateKey(value);
+
+    if (!dateKey) {
+      return this.getDisplayValue(value);
+    }
+
+    const [year, month, day] = dateKey.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
+  getFormattedTime(value: any) {
+    if (!value) {
+      return 'N/A';
+    }
+
+    const rawValue = String(value).trim();
+
+    if (/^\d{2}:\d{2}/.test(rawValue)) {
+      const date = new Date(`2000-01-01T${rawValue}`);
+
+      if (!Number.isNaN(date.getTime())) {
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      return rawValue.slice(0, 5);
+    }
+
+    const date = new Date(rawValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return rawValue;
+    }
+
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   get loginType() {
@@ -65,8 +185,10 @@ export class ViewPatientModal {
   }
 
   isPatientAdmitted() {
+    const latestVisit = this.getLatestVisit();
     const admittedValue =
       this.patient?.idAdmitted ??
+      latestVisit?.idAdmitted ??
       this.patient?.isAdmitted ??
       this.patient?.admitted ??
       this.patient?.is_admitted ??
@@ -84,7 +206,44 @@ export class ViewPatientModal {
       normalizedValue === 'yes' ||
       normalizedValue === 'admitted' ||
       !!this.patient?.admissionDate ||
+      !!latestVisit?.admissionDate ||
       !!this.patient?.admission?.admissionDate
+    );
+  }
+
+  isVisitAdmitted(visit: any) {
+    const admittedValue = visit?.idAdmitted ?? visit?.isAdmitted ?? visit?.admitted ?? visit?.is_admitted;
+
+    if (typeof admittedValue === 'boolean') {
+      return admittedValue;
+    }
+
+    const normalizedValue = String(admittedValue ?? '').trim().toLowerCase();
+
+    return (
+      normalizedValue === 'true' ||
+      normalizedValue === '1' ||
+      normalizedValue === 'yes' ||
+      normalizedValue === 'admitted' ||
+      !!visit?.admissionDate
+    );
+  }
+
+  isVisitDischarged(visit: any) {
+    const dischargedValue = visit?.idDischarge ?? visit?.isDischarged ?? visit?.discharged ?? visit?.is_discharged;
+
+    if (typeof dischargedValue === 'boolean') {
+      return dischargedValue;
+    }
+
+    const normalizedValue = String(dischargedValue ?? '').trim().toLowerCase();
+
+    return (
+      normalizedValue === 'true' ||
+      normalizedValue === '1' ||
+      normalizedValue === 'yes' ||
+      normalizedValue === 'discharged' ||
+      !!visit?.dischargeDate
     );
   }
 
@@ -230,6 +389,39 @@ export class ViewPatientModal {
       today.getFullYear(),
       String(today.getMonth() + 1).padStart(2, '0'),
       String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+  }
+
+  private getDateKey(value: any) {
+    if (!value) {
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return this.formatDateKey(value);
+    }
+
+    const rawValue = String(value).trim();
+    const dateMatch = rawValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (dateMatch) {
+      return `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+    }
+
+    const parsedDate = new Date(rawValue);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '';
+    }
+
+    return this.formatDateKey(parsedDate);
+  }
+
+  private formatDateKey(date: Date) {
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
     ].join('-');
   }
 
