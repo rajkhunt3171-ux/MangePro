@@ -289,6 +289,7 @@
                     inputmode="numeric"
                     name="fileCharge"
                     placeholder="Enter file charge"
+                    [disabled]="chargeApplied || chargeSaving"
                     [value]="getFileChargeValue()"
                     (input)="setFileCharge($any($event.target).value)"
                   />
@@ -299,11 +300,13 @@
                 <span>Status</span>
                 <div class="payment-status-toggle" role="group" aria-label="File charge payment status">
                   <button type="button" class="payment-status-button paid"
-                    [class.active]="isFileChargeStatus('paid')" (click)="setFileChargeStatus('paid')">
+                    [class.active]="isFileChargeStatus('paid')" [disabled]="chargeApplied || chargeSaving"
+                    (click)="setFileChargeStatus('paid')">
                     Paid
                   </button>
                   <button type="button" class="payment-status-button unpaid"
-                    [class.active]="isFileChargeStatus('unpaid')" (click)="setFileChargeStatus('unpaid')">
+                    [class.active]="isFileChargeStatus('unpaid')" [disabled]="chargeApplied || chargeSaving"
+                    (click)="setFileChargeStatus('unpaid')">
                     Unpaid
                   </button>
                 </div>
@@ -313,24 +316,27 @@
                 <span>Type</span>
                 <div class="payment-status-toggle" role="group" aria-label="File charge payment type">
                   <button type="button" class="payment-status-button cash"
-                    [class.active]="isFileChargePaymentType('cash')" (click)="setFileChargePaymentType('cash')">
+                    [class.active]="isFileChargePaymentType('cash')" [disabled]="chargeApplied || chargeSaving"
+                    (click)="setFileChargePaymentType('cash')">
                     Cash
                   </button>
                   <button type="button" class="payment-status-button online"
-                    [class.active]="isFileChargePaymentType('online')" (click)="setFileChargePaymentType('online')">
+                    [class.active]="isFileChargePaymentType('online')" [disabled]="chargeApplied || chargeSaving"
+                    (click)="setFileChargePaymentType('online')">
                     Online
                   </button>
                 </div>
               </div>
 
-              <button type="button" class="charge-submit-button" [disabled]="chargeSaving" (click)="submitCharge()">
-                {{ chargeSaving ? 'Submitting...' : 'Submit' }}
+              <button type="button" class="charge-submit-button" [disabled]="isChargeSubmitDisabled()" (click)="submitCharge()">
+                {{ chargeApplied ? 'Applied' : (chargeSaving ? 'Submitting...' : 'Submit') }}
               </button>
             </div>
 
             <div class="quick-charge-group" aria-label="Quick file charge amounts">
               @for (amount of fileChargeOptions; track amount) {
               <button type="button" class="quick-charge-button" [class.active]="isFileChargeAmount(amount)"
+                [disabled]="chargeApplied || chargeSaving"
                 (click)="setFileChargeAmount(amount)">
                 {{ amount }}
               </button>

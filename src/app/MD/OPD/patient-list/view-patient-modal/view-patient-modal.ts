@@ -19,6 +19,7 @@ export class ViewPatientModal {
   statusUpdating = false;
   admitUpdating = false;
   chargeSaving = false;
+  chargeApplied = false;
   statusErrorMessage = '';
   activeTab: PatientDetailTab = 'patient';
   fileCharge = '';
@@ -89,6 +90,10 @@ export class ViewPatientModal {
   }
 
   setFileCharge(value: any) {
+    if (this.chargeApplied) {
+      return;
+    }
+
     this.fileCharge = String(value ?? '');
   }
 
@@ -101,6 +106,10 @@ export class ViewPatientModal {
   }
 
   setFileChargeStatus(status: FileChargeStatus) {
+    if (this.chargeApplied) {
+      return;
+    }
+
     this.fileChargeStatus = status;
   }
 
@@ -109,11 +118,19 @@ export class ViewPatientModal {
   }
 
   setFileChargePaymentType(type: FileChargePaymentType) {
+    if (this.chargeApplied) {
+      return;
+    }
+
     this.fileChargePaymentType = type;
   }
 
   isFileChargePaymentType(type: FileChargePaymentType) {
     return this.fileChargePaymentType === type;
+  }
+
+  isChargeSubmitDisabled() {
+    return this.chargeSaving || this.chargeApplied;
   }
 
   getPatientTypeTagLabel() {
@@ -154,10 +171,21 @@ export class ViewPatientModal {
       Number.isFinite(chargeValue) &&
       chargeValue > 0;
 
+    this.chargeApplied = this.isPaidValue(fileCharge?.status);
     this.fileCharge = String(hasChargeValue ? chargeValue : this.getDefaultFileCharge());
-    this.fileChargeStatus = 'unpaid';
+    this.fileChargeStatus = this.chargeApplied ? 'paid' : 'unpaid';
     this.fileChargePaymentType = this.isOnlinePaymentType(fileCharge?.type) ? 'online' : 'cash';
     this.chargeInitialized = true;
+  }
+
+  private isPaidValue(value: any) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    const normalizedValue = String(value ?? '').trim().toLowerCase();
+
+    return normalizedValue === 'paid' || normalizedValue === 'true' || normalizedValue === '1' || normalizedValue === 'yes';
   }
 
   private isOnlinePaymentType(value: any) {
@@ -543,7 +571,7 @@ export class ViewPatientModal {
   }
 
   submitCharge() {
-    if (!this.patient || this.chargeSaving) {
+    if (!this.patient || this.isChargeSubmitDisabled()) {
       return;
     }
 
@@ -556,9 +584,12 @@ export class ViewPatientModal {
     this.patientListService.setPaymentStatus(payload).subscribe({
       next: (res) => {
         this.chargeSaving = false;
+        this.chargeApplied = true;
+        this.fileChargeStatus = 'paid';
+        const savedPayload = this.getChargePayload();
         this.patient = {
           ...this.patient,
-          charge: payload.charge,
+          charge: savedPayload.charge,
         };
         console.log('Payment status response:', res);
       },

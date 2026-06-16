@@ -526,6 +526,11 @@
   color: #1d4ed8;
 }
 
+.payment-status-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
 .charge-submit-button {
   align-items: center;
   background: #0f766e;
@@ -547,7 +552,7 @@
 }
 
 .charge-submit-button:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.75;
 }
 
@@ -586,6 +591,11 @@
   padding: 10px 12px;
 }
 
+.charge-input-wrap input:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
 .quick-charge-group {
   display: flex;
   flex-wrap: wrap;
@@ -612,6 +622,11 @@
   background: #ecfeff;
   border-color: #67e8f9;
   color: #0f766e;
+}
+
+.quick-charge-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
 }
 
 .visit-table-wrap {
