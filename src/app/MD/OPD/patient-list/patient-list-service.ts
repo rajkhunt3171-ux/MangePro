@@ -30,4 +30,8 @@ export class PatientListService {
   requestToAppointment(data: { patientId: string | number; dateandtime: string }): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/medicaldepartment/opd/request-to-appointment`, data);
   }
+
+  setPaymentStatus(data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/medicaldepartment/set-payment-status`, data);
+  }
 }

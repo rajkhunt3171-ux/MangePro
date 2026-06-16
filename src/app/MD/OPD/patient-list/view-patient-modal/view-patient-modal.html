@@ -266,30 +266,67 @@
         </div>
         } @else if (isActiveTab('charge')) {
         <div class="form-section">
-          <div class="section-title">
+          <div class="section-title charge-title">
             <span class="section-icon teal">
               <i class="fa-solid fa-file-invoice-dollar"></i>
             </span>
             <h2>Charge Details</h2>
+            <span [class]="'patient-type-badge ' + getPatientTypeTagClass()">
+              {{ getPatientTypeTagLabel() }}
+            </span>
           </div>
 
           <div class="charge-entry">
-            <label class="field charge-field">
-              <span>File Charge</span>
-              <div class="charge-input-wrap">
-                <span>Rs.</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  name="fileCharge"
-                  placeholder="Enter file charge"
-                  [value]="getFileChargeValue()"
-                  (input)="setFileCharge($any($event.target).value)"
-                />
+            <div class="charge-control-row">
+              <label class="field charge-field">
+                <span>File Charge</span>
+                <div class="charge-input-wrap">
+                  <span>Rs.</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    name="fileCharge"
+                    placeholder="Enter file charge"
+                    [value]="getFileChargeValue()"
+                    (input)="setFileCharge($any($event.target).value)"
+                  />
+                </div>
+              </label>
+
+              <div class="field payment-status-field">
+                <span>Status</span>
+                <div class="payment-status-toggle" role="group" aria-label="File charge payment status">
+                  <button type="button" class="payment-status-button paid"
+                    [class.active]="isFileChargeStatus('paid')" (click)="setFileChargeStatus('paid')">
+                    Paid
+                  </button>
+                  <button type="button" class="payment-status-button unpaid"
+                    [class.active]="isFileChargeStatus('unpaid')" (click)="setFileChargeStatus('unpaid')">
+                    Unpaid
+                  </button>
+                </div>
               </div>
-            </label>
+
+              <div class="field payment-type-field">
+                <span>Type</span>
+                <div class="payment-status-toggle" role="group" aria-label="File charge payment type">
+                  <button type="button" class="payment-status-button cash"
+                    [class.active]="isFileChargePaymentType('cash')" (click)="setFileChargePaymentType('cash')">
+                    Cash
+                  </button>
+                  <button type="button" class="payment-status-button online"
+                    [class.active]="isFileChargePaymentType('online')" (click)="setFileChargePaymentType('online')">
+                    Online
+                  </button>
+                </div>
+              </div>
+
+              <button type="button" class="charge-submit-button" [disabled]="chargeSaving" (click)="submitCharge()">
+                {{ chargeSaving ? 'Submitting...' : 'Submit' }}
+              </button>
+            </div>
 
             <div class="quick-charge-group" aria-label="Quick file charge amounts">
               @for (amount of fileChargeOptions; track amount) {

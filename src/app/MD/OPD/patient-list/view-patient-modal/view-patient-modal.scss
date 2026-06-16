@@ -416,11 +416,139 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 520px;
+  max-width: 880px;
+}
+
+.charge-title {
+  flex-wrap: wrap;
+}
+
+.charge-title .patient-type-badge {
+  margin-left: auto;
+}
+
+.patient-type-badge {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  min-height: 30px;
+  padding: 8px 11px;
+  white-space: nowrap;
+}
+
+.patient-type-badge.new {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #047857;
+}
+
+.patient-type-badge.old {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
 }
 
 .charge-field {
+  flex: 1 1 300px;
   max-width: 360px;
+}
+
+.charge-control-row {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.payment-status-field,
+.payment-type-field {
+  flex: 0 0 190px;
+}
+
+.payment-status-toggle {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 6px;
+  min-height: 44px;
+  padding: 5px;
+  width: 100%;
+}
+
+.payment-status-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #475569;
+  display: inline-flex;
+  flex: 1 1 0;
+  font-size: 13px;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 32px;
+  min-width: 0;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.payment-status-button.paid.active {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #047857;
+}
+
+.payment-status-button.unpaid.active {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+.payment-status-button.cash.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.payment-status-button.online.active {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+  color: #6d28d9;
+}
+
+.payment-status-button:not(.active):hover {
+  background: #ffffff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.charge-submit-button {
+  align-items: center;
+  background: #0f766e;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  white-space: nowrap;
+}
+
+.charge-submit-button:hover {
+  background: #115e59;
+}
+
+.charge-submit-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
 }
 
 .charge-input-wrap {
@@ -623,6 +751,20 @@
   .form-grid {
     grid-template-columns: 1fr;
   }
+
+  .charge-title .patient-type-badge {
+    margin-left: 0;
+  }
+
+  .charge-control-row,
+  .charge-field,
+  .payment-status-field,
+  .payment-type-field,
+  .charge-submit-button {
+    max-width: none;
+    width: 100%;
+  }
+
   .secondary-action {
     width: 100%;
   }

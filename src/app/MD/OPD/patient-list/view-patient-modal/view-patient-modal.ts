@@ -3,6 +3,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PatientListService } from '../patient-list-service';
 
 type PatientDetailTab = 'patient' | 'visit' | 'contact' | 'charge' | 'history';
+type FileChargeStatus = 'paid' | 'unpaid';
+type FileChargePaymentType = 'cash' | 'online';
 
 @Component({
   selector: 'app-view-patient-modal',
@@ -16,16 +18,23 @@ export class ViewPatientModal {
 
   statusUpdating = false;
   admitUpdating = false;
+  chargeSaving = false;
   statusErrorMessage = '';
   activeTab: PatientDetailTab = 'patient';
   fileCharge = '';
+  fileChargeStatus: FileChargeStatus = 'unpaid';
+  fileChargePaymentType: FileChargePaymentType = 'cash';
   readonly fileChargeOptions = [100, 200, 300, 500, 1000];
-  private fileChargeInitialized = false;
+  private chargeInitialized = false;
 
   constructor(
     public activeModal: NgbActiveModal,
     private patientListService: PatientListService,
   ) { }
+
+  ngOnInit() {
+    this.initializeChargeFlow();
+  }
 
   getPatientVisits() {
     const allVisitData = this.patient?.allVisitData;
@@ -65,7 +74,7 @@ export class ViewPatientModal {
 
   setActiveTab(tab: PatientDetailTab) {
     if (tab === 'charge') {
-      this.initializeFileCharge();
+      this.initializeChargeFlow();
     }
 
     this.activeTab = tab;
@@ -81,7 +90,6 @@ export class ViewPatientModal {
 
   setFileCharge(value: any) {
     this.fileCharge = String(value ?? '');
-    this.fileChargeInitialized = true;
   }
 
   setFileChargeAmount(amount: number) {
@@ -92,23 +100,87 @@ export class ViewPatientModal {
     return this.getFileChargeValue() === String(amount);
   }
 
-  private initializeFileCharge() {
-    if (this.fileChargeInitialized) {
+  setFileChargeStatus(status: FileChargeStatus) {
+    this.fileChargeStatus = status;
+  }
+
+  isFileChargeStatus(status: FileChargeStatus) {
+    return this.fileChargeStatus === status;
+  }
+
+  setFileChargePaymentType(type: FileChargePaymentType) {
+    this.fileChargePaymentType = type;
+  }
+
+  isFileChargePaymentType(type: FileChargePaymentType) {
+    return this.fileChargePaymentType === type;
+  }
+
+  getPatientTypeTagLabel() {
+    return this.isNewPatient() ? 'New Patient' : 'Old Patient';
+  }
+
+  getPatientTypeTagClass() {
+    return this.isNewPatient() ? 'new' : 'old';
+  }
+
+  private isNewPatient() {
+    const value = this.patient?.isNewPatient;
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    const normalizedValue = String(value ?? '').trim().toLowerCase();
+
+    return normalizedValue === 'true' || normalizedValue === '1' || normalizedValue === 'yes' || normalizedValue === 'new';
+  }
+
+  private getDefaultFileCharge() {
+    return this.isNewPatient() ? 500 : 300;
+  }
+
+  private initializeChargeFlow() {
+    if (this.chargeInitialized) {
       return;
     }
 
-    const latestVisit = this.getLatestVisit();
-    const value =
-      this.patient?.fileCharge ??
-      this.patient?.filecharge ??
-      this.patient?.file_charge ??
-      latestVisit?.fileCharge ??
-      latestVisit?.filecharge ??
-      latestVisit?.file_charge ??
-      '';
+    const fileCharge = this.patient?.charge?.fileCharge || {};
+    const chargeValue = Number(fileCharge?.charge);
+    const hasChargeValue =
+      fileCharge?.charge !== null &&
+      fileCharge?.charge !== undefined &&
+      fileCharge?.charge !== '' &&
+      Number.isFinite(chargeValue) &&
+      chargeValue > 0;
 
-    this.fileCharge = value === null || value === undefined ? '' : String(value);
-    this.fileChargeInitialized = true;
+    this.fileCharge = String(hasChargeValue ? chargeValue : this.getDefaultFileCharge());
+    this.fileChargeStatus = 'unpaid';
+    this.fileChargePaymentType = this.isOnlinePaymentType(fileCharge?.type) ? 'online' : 'cash';
+    this.chargeInitialized = true;
+  }
+
+  private isOnlinePaymentType(value: any) {
+    const normalizedValue = String(value ?? '').trim().toLowerCase();
+
+    return normalizedValue === 'online' || normalizedValue === 'upi' || normalizedValue === 'card' || normalizedValue === 'net banking';
+  }
+
+  private getChargePayload() {
+    const chargeValue = Number(this.fileCharge);
+
+    return {
+      patientId: this.patient?.patientId,
+      cdId: this.getLatestVisit()?.cdId ?? this.patient?.cdId,
+      visitId: this.getLatestVisit()?.visitId,
+      charge: {
+        fileCharge: {
+          charge: Number.isFinite(chargeValue) ? chargeValue : 0,
+          type: this.fileChargePaymentType,
+          status: this.fileChargeStatus,
+        },
+      },
+    };
   }
 
   getPatientStatus() {
@@ -468,6 +540,34 @@ export class ViewPatientModal {
       String(date.getMonth() + 1).padStart(2, '0'),
       String(date.getDate()).padStart(2, '0'),
     ].join('-');
+  }
+
+  submitCharge() {
+    if (!this.patient || this.chargeSaving) {
+      return;
+    }
+
+    const payload = this.getChargePayload();
+
+    console.log('Payload:', payload);
+    this.chargeSaving = true;
+    this.statusErrorMessage = '';
+
+    this.patientListService.setPaymentStatus(payload).subscribe({
+      next: (res) => {
+        this.chargeSaving = false;
+        this.patient = {
+          ...this.patient,
+          charge: payload.charge,
+        };
+        console.log('Payment status response:', res);
+      },
+      error: (err) => {
+        this.chargeSaving = false;
+        this.statusErrorMessage = err?.error?.message || 'Payment status set karvama error aavyo.';
+        console.error('Error setting payment status', err);
+      },
+    });
   }
 
 }
