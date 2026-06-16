@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PatientListService } from '../patient-list-service';
 
+type PatientDetailTab = 'patient' | 'visit' | 'contact' | 'charge' | 'history';
+
 @Component({
   selector: 'app-view-patient-modal',
   templateUrl: './view-patient-modal.html',
@@ -15,7 +17,10 @@ export class ViewPatientModal {
   statusUpdating = false;
   admitUpdating = false;
   statusErrorMessage = '';
-  activeTab: 'patient' | 'visit' | 'contact' | 'history' = 'patient';
+  activeTab: PatientDetailTab = 'patient';
+  fileCharge = '';
+  readonly fileChargeOptions = [100, 200, 300, 500, 1000];
+  private fileChargeInitialized = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -58,12 +63,52 @@ export class ViewPatientModal {
     return value;
   }
 
-  setActiveTab(tab: 'patient' | 'visit' | 'contact' | 'history') {
+  setActiveTab(tab: PatientDetailTab) {
+    if (tab === 'charge') {
+      this.initializeFileCharge();
+    }
+
     this.activeTab = tab;
   }
 
-  isActiveTab(tab: 'patient' | 'visit' | 'contact' | 'history') {
+  isActiveTab(tab: PatientDetailTab) {
     return this.activeTab === tab;
+  }
+
+  getFileChargeValue() {
+    return this.fileCharge;
+  }
+
+  setFileCharge(value: any) {
+    this.fileCharge = String(value ?? '');
+    this.fileChargeInitialized = true;
+  }
+
+  setFileChargeAmount(amount: number) {
+    this.setFileCharge(amount);
+  }
+
+  isFileChargeAmount(amount: number) {
+    return this.getFileChargeValue() === String(amount);
+  }
+
+  private initializeFileCharge() {
+    if (this.fileChargeInitialized) {
+      return;
+    }
+
+    const latestVisit = this.getLatestVisit();
+    const value =
+      this.patient?.fileCharge ??
+      this.patient?.filecharge ??
+      this.patient?.file_charge ??
+      latestVisit?.fileCharge ??
+      latestVisit?.filecharge ??
+      latestVisit?.file_charge ??
+      '';
+
+    this.fileCharge = value === null || value === undefined ? '' : String(value);
+    this.fileChargeInitialized = true;
   }
 
   getPatientStatus() {

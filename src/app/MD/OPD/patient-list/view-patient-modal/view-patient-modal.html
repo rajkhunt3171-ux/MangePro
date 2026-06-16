@@ -94,6 +94,11 @@
           <i class="fa-solid fa-phone-volume"></i>
           <span>Emergency</span>
         </button>
+        <button type="button" class="patient-tab" [class.active]="isActiveTab('charge')"
+          [attr.aria-selected]="isActiveTab('charge')" role="tab" (click)="setActiveTab('charge')">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span>Charge</span>
+        </button>
         <button type="button" class="patient-tab" [class.active]="isActiveTab('history')"
           [attr.aria-selected]="isActiveTab('history')" role="tab" (click)="setActiveTab('history')">
           <i class="fa-solid fa-clock-rotate-left"></i>
@@ -257,6 +262,43 @@
               <span>Mobile Number</span>
               <div class="readonly-value">{{ getDisplayValue(patient?.emergencyContactNumber) }}</div>
             </label>
+          </div>
+        </div>
+        } @else if (isActiveTab('charge')) {
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon teal">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </span>
+            <h2>Charge Details</h2>
+          </div>
+
+          <div class="charge-entry">
+            <label class="field charge-field">
+              <span>File Charge</span>
+              <div class="charge-input-wrap">
+                <span>Rs.</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  name="fileCharge"
+                  placeholder="Enter file charge"
+                  [value]="getFileChargeValue()"
+                  (input)="setFileCharge($any($event.target).value)"
+                />
+              </div>
+            </label>
+
+            <div class="quick-charge-group" aria-label="Quick file charge amounts">
+              @for (amount of fileChargeOptions; track amount) {
+              <button type="button" class="quick-charge-button" [class.active]="isFileChargeAmount(amount)"
+                (click)="setFileChargeAmount(amount)">
+                {{ amount }}
+              </button>
+              }
+            </div>
           </div>
         </div>
         } @else {
