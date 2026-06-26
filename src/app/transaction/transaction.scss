@@ -1,0 +1,129 @@
+@use "../MD/OPD/patient-list/patient-list.scss";
+
+.transaction-table {
+  min-width: 1480px;
+}
+
+.transaction-table th:nth-child(4),
+.transaction-table th:nth-child(5),
+.transaction-table th:nth-child(6),
+.transaction-table th:nth-child(7),
+.transaction-table th:nth-child(8),
+.transaction-table td:nth-child(4),
+.transaction-table td:nth-child(5),
+.transaction-table td:nth-child(6),
+.transaction-table td:nth-child(7),
+.transaction-table td:nth-child(8) {
+  text-align: center;
+}
+
+.transaction-summary strong {
+  font-size: 20px;
+}
+
+.entity-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.entity-cell strong {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.entity-cell small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.amount-text {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.commission-text {
+  color: #9a3412;
+}
+
+.balance-text {
+  color: #0f766e;
+}
+
+.info-chip {
+  align-items: center;
+  background: #fff7ed;
+  border-radius: 999px;
+  color: #c2410c;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: center;
+  min-width: 74px;
+  padding: 7px 10px;
+}
+
+.payment-stack {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.type-chip,
+.status-chip {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 1;
+  min-width: 88px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.type-chip,
+.status-chip,
+.info-chip {
+  min-width: 88px;
+}
+
+.type-chip.cash {
+  background: #ecfccb;
+  color: #3f6212;
+}
+
+.type-chip.online {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.type-chip.unknown {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.status-chip.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-chip.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-chip.failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-chip.unknown {
+  background: #f1f5f9;
+  color: #475569;
+}

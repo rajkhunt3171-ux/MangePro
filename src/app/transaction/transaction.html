@@ -1,0 +1,165 @@
+<section class="patient-list-page transaction-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Transaction Module</p>
+      <h1>Transaction List</h1>
+    </div>
+
+    <button type="button" class="primary-action" (click)="loadTransactions()">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="summary-grid transaction-summary">
+    <div class="summary-card">
+      <div class="summary-icon blue">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+      </div>
+      <div>
+        <span class="summary-label">Total Transactions</span>
+        <strong>{{ totalTransactions }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon green">
+        <i class="fa-solid fa-sack-dollar"></i>
+      </div>
+      <div>
+        <span class="summary-label">Total Charge</span>
+        <strong>{{ getAmountLabel(totalChargeAmount) }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon amber">
+        <i class="fa-solid fa-user-doctor"></i>
+      </div>
+      <div>
+        <span class="summary-label">Commission Amount</span>
+        <strong>{{ getAmountLabel(totalCommissionAmount) }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon teal">
+        <i class="fa-solid fa-wallet"></i>
+      </div>
+      <div>
+        <span class="summary-label">Balance Amount</span>
+        <strong>{{ getAmountLabel(totalBalanceAmount) }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        placeholder="Search transaction / patient / visit"
+        [value]="searchText()"
+        (input)="setSearchText($any($event.target).value)" />
+    </label>
+  </div>
+
+  <div class="patient-table-panel">
+    <div class="table-responsive">
+      <table class="patient-table transaction-table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Transaction</th>
+            <th>Patient / Visit</th>
+            <th>Doctor / Admin</th>
+            <th>Charge</th>
+            <th>Dr. Comm.</th>
+            <th>Comm. Amt</th>
+            <th>Balance</th>
+            <th>Payment</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          @let visibleTransactions = filteredTransactions();
+          @if (loading) {
+          <tr>
+            <td colspan="10" class="empty-state">Loading transactions...</td>
+          </tr>
+          } @else if (errorMessage) {
+          <tr>
+            <td colspan="10" class="empty-state error">{{ errorMessage }}</td>
+          </tr>
+          } @else if (visibleTransactions.length === 0) {
+          <tr>
+            <td colspan="10" class="empty-state">No transactions found.</td>
+          </tr>
+          } @else {
+          @for (transaction of visibleTransactions; track transaction.transactionId || $index; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>
+              <div class="entity-cell">
+                <strong>{{ getDisplayValue(transaction.transactionId) }}</strong>
+                <small>Paid Txn</small>
+              </div>
+            </td>
+            <td>
+              <div class="entity-cell">
+                <strong>{{ getDisplayValue(transaction.patientId) }}</strong>
+                <small>Visit: {{ getDisplayValue(transaction.visitId) }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="entity-cell">
+                <strong>{{ getDisplayValue(transaction.drId) }}</strong>
+                <small>Admin: {{ getDisplayValue(transaction.adminUserId) }}</small>
+              </div>
+            </td>
+            <td>
+              <strong class="amount-text">{{ getAmountLabel(transaction.charge) }}</strong>
+            </td>
+            <td>
+              <span class="info-chip">{{ getCommissionLabel(transaction) }}</span>
+            </td>
+            <td>
+              <strong class="amount-text commission-text">{{ getAmountLabel(transaction.commissionAmount) }}</strong>
+            </td>
+            <td>
+              <strong class="amount-text balance-text">{{ getAmountLabel(transaction.balance) }}</strong>
+            </td>
+            <td>
+              <div class="payment-stack">
+                <span
+                  class="type-chip"
+                  [class.cash]="getPaymentTypeClass(transaction) === 'cash'"
+                  [class.online]="getPaymentTypeClass(transaction) === 'online'"
+                  [class.unknown]="getPaymentTypeClass(transaction) === 'unknown'">
+                  {{ getPaymentTypeLabel(transaction) }}
+                </span>
+                <span
+                  class="status-chip"
+                  [class.paid]="getPaymentStatusClass(transaction) === 'paid'"
+                  [class.pending]="getPaymentStatusClass(transaction) === 'pending'"
+                  [class.failed]="getPaymentStatusClass(transaction) === 'failed'"
+                  [class.unknown]="getPaymentStatusClass(transaction) === 'unknown'">
+                  {{ getPaymentStatusLabel(transaction) }}
+                </span>
+              </div>
+            </td>
+            <td>
+              @let transactionDateTime = getTransactionTimeDate(transaction);
+              <div class="entity-cell">
+                <strong>{{ transactionDateTime.date }}</strong>
+                <small>{{ transactionDateTime.time || 'N/A' }}</small>
+              </div>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

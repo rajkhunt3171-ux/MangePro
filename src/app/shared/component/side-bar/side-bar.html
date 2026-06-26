@@ -42,6 +42,11 @@
                 <i class="{{ item?.icon }}"></i>
                 <span class="sidebar-text">{{ item.name }}</span>
             </a>
+            }@else {
+            <a class="sidebar-link" routerLink="/transaction">
+                <i class="fas fa-money-bill-transfer"></i>
+                <span class="sidebar-text">Transaction</span>
+            </a>
             }
         </nav>
         <div class="sidebar-user-details">

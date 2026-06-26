@@ -12,6 +12,7 @@ import { WardManagement } from '../MD/IPD/ward-management/ward-management';
 import { AppointmentManage } from '../MM/appointment-manage/appointment-manage';
 import { AppointmentRequest } from '../MM/appointment-request/appointment-request';
 import { BillingInvoice } from '../MM/billing-invoice/billing-invoice';
+import { Transaction } from '../transaction/transaction';
 
 export const layOutRoutes: Routes = [
   {
@@ -80,5 +81,9 @@ export const layOutRoutes: Routes = [
   {
     path: 'billing',
     component: BillingInvoice
+  },
+  {
+    path: 'transaction',
+    component: Transaction
   }
 ];
