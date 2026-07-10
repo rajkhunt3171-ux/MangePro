@@ -1,0 +1,22 @@
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            ✓
+        </div>
+        
+        @if (redirectStatus === 'succeeded') {
+            <h1>Payment Successful!</h1>
+            <p class="message">Thank you for your payment. Your transaction has been completed.</p>
+        } @else {
+            <h1 class="text-warning">Payment Status: {{redirectStatus}}</h1>
+            <p class="message">Your transaction is currently in '{{redirectStatus}}' status.</p>
+        }
+
+        <div class="transaction-details" *ngIf="paymentIntentId">
+            <span class="label">Stripe Transaction ID:</span>
+            <span class="value">{{paymentIntentId}}</span>
+        </div>
+
+        <button class="btn btn-primary mt-4" routerLink="/orderlist">Back to Orders</button>
+    </div>
+</div>

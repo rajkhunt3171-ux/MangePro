@@ -1,5 +1,11 @@
 <div class="modal-header">
-    <h3 class="modal-title">Select Payment Method</h3>
+    <h3 class="modal-title">
+        @if (showStripeForm) {
+            Pay with Stripe
+        } @else {
+            Select Payment Method
+        }
+    </h3>
     <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
 </div>
 
@@ -7,15 +13,32 @@
     <p class="order-summary text-center">
         Paying <strong>₹{{order?.amount}}</strong> for Order <strong>{{order?.order_id}}</strong>
     </p>
-    
-    <div class="gateway-grid">
-        @for (gateway of paymentGateways; track gateway.id) {
+
+    @if (!showStripeForm) {
+        <div class="gateway-grid">
+            @for (gateway of paymentGateways; track gateway.id) {
             <div class="gateway-item" (click)="processPayment(gateway.id)">
                 <div class="gateway-img-wrapper">
                     <img [src]="gateway.img" [alt]="gateway.name" class="gateway-img">
                 </div>
                 <span class="gateway-name">{{gateway.name}}</span>
             </div>
-        }
-    </div>
+            }
+        </div>
+    }
+
+    <!-- Stripe form container -->
+    @if (showStripeForm) {
+        <div class="stripe-form-container">
+            <div id="payment-stripe-element" style="min-height: 200px; padding: 10px; border: 1px solid #edf2f7; border-radius: 8px; margin-bottom: 20px;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <button class="btn btn-outline-secondary" (click)="showStripeForm = false" style="padding: 10px 20px;">
+                    Back
+                </button>
+                <button class="btn btn-primary" (click)="confirmPayment()" style="padding: 10px 20px; font-weight: 600; background: #635bff; border-color: #635bff; width: 100%;">
+                    Confirm Payment - ₹{{order?.amount}}
+                </button>
+            </div>
+        </div>
+    }
 </div>
