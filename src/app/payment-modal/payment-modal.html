@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <h3 class="modal-title">Select Payment Method</h3>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+
+<div class="modal-body">
+    <p class="order-summary text-center">
+        Paying <strong>₹{{order?.amount}}</strong> for Order <strong>{{order?.order_id}}</strong>
+    </p>
+    
+    <div class="gateway-grid">
+        @for (gateway of paymentGateways; track gateway.id) {
+            <div class="gateway-item" (click)="processPayment(gateway.id)">
+                <div class="gateway-img-wrapper">
+                    <img [src]="gateway.img" [alt]="gateway.name" class="gateway-img">
+                </div>
+                <span class="gateway-name">{{gateway.name}}</span>
+            </div>
+        }
+    </div>
+</div>

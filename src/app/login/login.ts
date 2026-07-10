@@ -61,7 +61,7 @@ export class Login implements OnInit {
         this.sharedService.userDetails = res.user;
         this.sharedService.userDepartment = res.department;
         localStorage.setItem('id', res.user.id);
-        localStorage.setItem('type',"0");
+        localStorage.setItem('type', "0");
         this.socketService.connect(res.user.id);
         this.router.navigate(['/']);
       },
@@ -90,7 +90,7 @@ export class Login implements OnInit {
         this.sharedService.userDetails = res.doctor;
         // this.sharedService.userDepartment = res.department;
         localStorage.setItem('id', res.doctor.id);
-        localStorage.setItem('type',"1");
+        localStorage.setItem('type', "1");
         this.router.navigate(['/']);
       },
       error: (error) => {
@@ -98,5 +98,9 @@ export class Login implements OnInit {
         localStorage.removeItem('authToken');
       }
     });
+  }
+
+  paymentGateway() {
+    this.router.navigate(['/payment-gateway']);
   }
 }

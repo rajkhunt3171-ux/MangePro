@@ -1,0 +1,179 @@
+.order-list-wrapper {
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    padding: 40px;
+}
+
+.order-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+
+    h2 {
+        margin: 0;
+    }
+}
+
+.content {
+    min-height: 150px;
+    text-align: left;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .order-items {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        width: 100%;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid #edf2f7;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+        }
+
+        .order-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            h4 { 
+                margin: 0; 
+                color: #2d3748; 
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+            p { 
+                margin: 0; 
+                color: #718096; 
+                font-size: 0.9rem; 
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .gateway-info {
+                display: inline-block;
+                background: #edf2f7;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                color: #4a5568;
+                font-weight: 500;
+                margin-top: 4px;
+            }
+        }
+
+        .order-status {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                
+                &.pending { background: #feebc8; color: #c05621; }
+                &.success { background: #c6f6d5; color: #276749; }
+                &.failed { background: #fed7d7; color: #9b2c2c; }
+            }
+            .amount {
+                margin: 0;
+                font-weight: 700;
+                font-size: 1.25rem;
+                color: #2d3748;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: auto;
+                
+                .delete-btn {
+                    background-color: transparent;
+                    color: #e53e3e;
+                    border: 1px solid #e53e3e;
+                    padding: 4px 10px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background-color: #e53e3e;
+                        color: white;
+                    }
+                }
+
+                .pay-btn {
+                    background-color: #3182ce;
+                    color: white;
+                    border: 1px solid #3182ce;
+                    padding: 4px 10px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    font-weight: 600;
+
+                    &:hover {
+                        background-color: #2b6cb0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.primary-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    &.add-btn {
+        background-color: #28a745;
+    }
+}
+

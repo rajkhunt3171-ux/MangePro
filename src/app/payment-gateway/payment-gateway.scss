@@ -1,0 +1,27 @@
+.payment-gateway-wrapper {
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    padding: 40px;
+}
+
+.payment-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+
+.btn-group {
+    margin-top: 20px;
+}
+
+.primary-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
