@@ -11,9 +11,10 @@ export class PaymentService {
   constructor(private http: HttpClient) { }
 
   createStripePaymentIntent(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/create-stripe-payment-intent`,
-      {
-        amount: data
-      });
+    return this.http.post<any>(`${this.apiUrl}/create-stripe-payment-intent`, { amount: data });
+  }
+
+  createPaypalPaymentIntent(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/create-paypal-payment-intent`, { amount: data });
   }
 }

@@ -1,11 +1,17 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaymentService } from './payment.service';
 import { loadStripe, Stripe, StripeElements } from '@stripe/stripe-js';
 import { environment } from '../../environments/environment';
-
 import { Router } from '@angular/router';
+
+declare var paypal: any;
 
 @Component({
   selector: 'app-payment-modal',
@@ -15,24 +21,26 @@ import { Router } from '@angular/router';
   styleUrls: ['./payment-modal.scss']
 })
 export class PaymentModalComponent implements OnInit {
+
   @Input() order: any;
 
   stripe: Stripe | null = null;
   stripeElements: StripeElements | null = null;
-  showStripeForm: boolean = false;
+
+  showStripeForm = false;
+  showPaypalForm = false;
 
   paymentGateways = [
-    { id: 'razorpay', name: 'Razorpay', img: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Razorpay_Logo.png' },
-    { id: 'stripe', name: 'Stripe', img: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg' },
-    { id: 'paypal', name: 'PayPal', img: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg' },
-    { id: 'phonepe', name: 'PhonePe', img: 'https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg' },
-    { id: 'paytm', name: 'Paytm', img: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg' },
-    { id: 'googlepay', name: 'Google Pay', img: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg' },
-    { id: 'amazonpay', name: 'Amazon Pay', img: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Amazon_Pay_logo.svg' },
-    { id: 'cashfree', name: 'Cashfree', img: 'https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/ub9kksatxt7hvwzuxnle' },
-    { id: 'ccavenue', name: 'CCAvenue', img: 'https://1000logos.net/wp-content/uploads/2023/10/CCAvenue-Logo-1024x576.png' },
-    { id: 'instamojo', name: 'Instamojo', img: 'https://www.instamojo.com/blog/wp-content/uploads/2016/11/logo.png' },
-    { id: 'cash', name: 'Cash', img: 'https://cdn-icons-png.flaticon.com/512/2489/2489756.png' }
+    {
+      id: 'stripe',
+      name: 'Stripe',
+      img: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg'
+    },
+    {
+      id: 'paypal',
+      name: 'PayPal',
+      img: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg'
+    }
   ];
 
   constructor(
@@ -42,131 +50,152 @@ export class PaymentModalComponent implements OnInit {
     private router: Router
   ) { }
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit() {
     this.stripe = await loadStripe(environment.stripePublishableKey);
   }
 
-  processPayment(gatewayId: string) {
-    if (!this.order) return;
-    if (gatewayId === 'stripe') {
+  processPayment(id: string) {
+
+    if (id === 'stripe') {
       this.doStripePayment();
-    } else if (gatewayId === 'razorpay') {
-      this.doRazorpayPayment();
-    } else if (gatewayId === 'paypal') {
-      this.doPaypalPayment();
-    } else if (gatewayId === 'phonepe') {
-      this.doPhonepePayment();
-    } else if (gatewayId === 'paytm') {
-      this.doPaytmPayment();
-    } else if (gatewayId === 'googlepay') {
-      this.doGooglePayPayment();
-    } else if (gatewayId === 'amazonpay') {
-      this.doAmazonPayPayment();
-    } else if (gatewayId === 'cashfree') {
-      this.doCashfreePayment();
-    } else if (gatewayId === 'ccavenue') {
-      this.doCCAvenuePayment();
-    } else if (gatewayId === 'instamojo') {
-      this.doInstamojoPayment();
-    } else if (gatewayId === 'cash') {
-      this.doCashPayment();
     }
+
+    if (id === 'paypal') {
+      this.doPaypalPayment();
+    }
+
   }
 
-  async doStripePayment() {
-    if (!this.stripe) {
-      alert('Stripe not loaded');
-      return;
-    }
+  //-----------------------------------------
+  // STRIPE
+  //-----------------------------------------
 
-    this.paymentService.createStripePaymentIntent(this.order.amount).subscribe({
-      next: async (res: any) => {
-        console.log(res);
+  async doStripePayment() {
+
+    this.paymentService
+      .createStripePaymentIntent(this.order.amount)
+      .subscribe(async (res: any) => {
+
         this.showStripeForm = true;
-        this.cdr.detectChanges(); // Force view update immediately
+        this.showPaypalForm = false;
+
+        this.cdr.detectChanges();
 
         this.stripeElements = this.stripe!.elements({
           clientSecret: res.clientSecret
         });
 
-        const paymentElement = this.stripeElements.create('payment');
-        paymentElement.mount('#payment-stripe-element');
-      },
+        const paymentElement =
+          this.stripeElements.create('payment');
 
-      error: (err) => {
-        console.log(err);
-        alert("Payment Failed");
-      }
-    });
+        paymentElement.mount('#payment-stripe-element');
+
+      });
+
   }
 
   async confirmPayment() {
 
-    if (!this.stripe || !this.stripeElements) return;
+    const result = await this.stripe!.confirmPayment({
 
-    const result = await this.stripe.confirmPayment({
-      elements: this.stripeElements,
-      confirmParams: {
-        return_url: 'http://localhost:4200/payment-success'
-      },
+      elements: this.stripeElements!,
+
       redirect: 'if_required'
+
     });
 
-    if (result.error) {
-      alert(result.error.message);
-    } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-      alert('Payment successful!');
-      console.log(result);
-      this.activeModal.close('success');
-      
-      // Navigate to the success page using Angular Router (SPA approach)
-      this.router.navigate(['/payment-success'], {
-        queryParams: {
-          payment_intent: result.paymentIntent.id,
-          redirect_status: result.paymentIntent.status
-        }
-      });
+    if (result.paymentIntent?.status == 'succeeded') {
+
+      alert("Stripe Payment Success");
+
+      this.activeModal.close();
+
     }
 
   }
 
-  doRazorpayPayment() {
-
-  }
+  //-----------------------------------------
+  // PAYPAL
+  //-----------------------------------------
 
   doPaypalPayment() {
+    this.showPaypalForm = true;
+    this.showStripeForm = false;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+
+      const div =
+        document.getElementById("paypal-button-container");
+
+      if (div) {
+        div.innerHTML = "";
+      }
+
+      paypal.Buttons({
+
+        style: {
+
+          layout: 'vertical',
+
+          color: 'blue',
+
+          shape: 'rect',
+
+          label: 'paypal'
+
+        },
+
+        createOrder: () => {
+
+          return this.paymentService
+            .createPaypalPaymentIntent(this.order.amount)
+            .toPromise()
+            .then((res: any) => {
+
+              return res.orderID;
+
+            });
+
+        },
+
+        onApprove: (data: any) => {
+
+          return this.paymentService
+            .createPaypalPaymentIntent(data.orderID)
+            .toPromise()
+            .then((payment: any) => {
+
+              alert("Payment Success");
+
+              console.log(payment);
+
+              this.activeModal.close();
+
+              this.router.navigate(['/payment-success']);
+
+            });
+
+        },
+
+        onCancel: () => {
+
+          alert("Payment Cancelled");
+
+        },
+
+        onError: (err: any) => {
+
+          console.log(err);
+
+          alert("Payment Failed");
+
+        }
+
+      }).render('#paypal-button-container');
+
+    }, 100);
 
   }
 
-  doPhonepePayment() {
-
-  }
-
-  doPaytmPayment() {
-
-  }
-
-  doGooglePayPayment() {
-
-  }
-
-  doAmazonPayPayment() {
-
-  }
-
-  doCashfreePayment() {
-
-  }
-
-  doCCAvenuePayment() {
-
-  }
-
-  doInstamojoPayment() {
-
-  }
-
-  doCashPayment() {
-
-  }
 }
